@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { Lock, LogOut, Plus, Trash2, Save, Eye, Upload, ImageIcon } from "lucide-react";
+import { Lock, LogOut, Plus, Trash2, Save, Eye, Upload, Send, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { StatusBadge } from "./tickets";
 import type { Rank, CoinPack, CrateKey, Settings } from "@/lib/store-defaults";
@@ -125,6 +125,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <TabsTrigger value="coins">Coins</TabsTrigger>
             <TabsTrigger value="keys">Crate Keys</TabsTrigger>
             <TabsTrigger value="tickets">Tickets</TabsTrigger>
+            <TabsTrigger value="invoices">Invoices</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="homepage" className="mt-5"><HomepageAdmin /></TabsContent>
@@ -132,6 +133,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           <TabsContent value="coins" className="mt-5"><CoinsAdmin /></TabsContent>
           <TabsContent value="keys" className="mt-5"><KeysAdmin /></TabsContent>
           <TabsContent value="tickets" className="mt-5"><TicketsAdmin /></TabsContent>
+          <TabsContent value="invoices" className="mt-5"><InvoicesAdmin /></TabsContent>
           <TabsContent value="settings" className="mt-5"><SettingsAdmin /></TabsContent>
         </Tabs>
       </div>
