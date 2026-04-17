@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Lock, LogOut, Plus, Trash2, Save, Eye, Upload, Send, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { StatusBadge } from "./tickets";
