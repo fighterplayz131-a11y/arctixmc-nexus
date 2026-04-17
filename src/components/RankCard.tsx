@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Check, Plus, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/lib/store-context";
 import type { Rank } from "@/lib/store-defaults";
 import { toast } from "sonner";
+import { GemBurstButton } from "@/components/GemBurstButton";
 
 export function RankCard({ rank }: { rank: Rank }) {
   const { addToCart } = useStore();
@@ -88,7 +88,7 @@ export function RankCard({ rank }: { rank: Rank }) {
           </button>
         )}
 
-        <Button
+        <GemBurstButton
           onClick={() => {
             addToCart({ id: `rank-${rank.id}`, type: "rank", name: rank.name + " Rank", price: rank.discountPrice });
             toast.success(`${rank.name} added to cart`);
@@ -96,8 +96,8 @@ export function RankCard({ rank }: { rank: Rank }) {
           className="w-full font-semibold border-0"
           style={{ background: rank.color, color: "#0b1020" }}
         >
-          <Plus className="h-4 w-4 mr-1" /> Add to Cart
-        </Button>
+          <Plus className="h-4 w-4" /> Add to Cart
+        </GemBurstButton>
       </div>
     </div>
   );

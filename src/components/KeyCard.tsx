@@ -1,8 +1,8 @@
 import { Key, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store-context";
 import type { CrateKey } from "@/lib/store-defaults";
 import { toast } from "sonner";
+import { GemBurstButton } from "@/components/GemBurstButton";
 
 export function KeyCard({ item }: { item: CrateKey }) {
   const { addToCart } = useStore();
@@ -15,7 +15,7 @@ export function KeyCard({ item }: { item: CrateKey }) {
       <p className="text-sm text-muted-foreground mb-4 flex-1 leading-relaxed">{item.description}</p>
       <div className="flex items-center justify-between gap-2 pt-2 border-t border-border">
         <span className="text-xl font-bold text-foreground">रु {item.price}</span>
-        <Button
+        <GemBurstButton
           size="sm"
           onClick={() => {
             addToCart({ id: `key-${item.id}`, type: "key", name: item.name, price: item.price });
@@ -23,8 +23,8 @@ export function KeyCard({ item }: { item: CrateKey }) {
           }}
           className="gradient-primary text-primary-foreground"
         >
-          <Plus className="h-4 w-4 mr-1" /> Add
-        </Button>
+          <Plus className="h-4 w-4" /> Add
+        </GemBurstButton>
       </div>
     </div>
   );
