@@ -1,6 +1,7 @@
 import { useStore } from "@/lib/store-context";
 import { Link } from "@tanstack/react-router";
 import { DiscordIcon } from "./DiscordIcon";
+import logo from "@/assets/arctix-logo.png";
 
 export function Footer() {
   const { settings } = useStore();
@@ -9,10 +10,10 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 md:px-8 py-10 grid gap-8 md:grid-cols-4">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center font-display font-bold text-primary-foreground">A</div>
+            <img src={logo} alt="ArctixMC" className="h-8 w-8 rounded-md object-cover" width={32} height={32} />
             <span className="font-display text-lg font-bold text-foreground">{settings.serverName}</span>
           </div>
-          <p className="text-sm text-muted-foreground">The ultimate Minecraft survival experience. Join thousands of players today.</p>
+          <p className="text-sm text-muted-foreground">A premium Minecraft network. Survival, Lifesteal & PvP — built for the long run.</p>
         </div>
         <div>
           <h4 className="text-sm font-semibold mb-3 text-foreground">Server</h4>
