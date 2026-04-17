@@ -109,6 +109,30 @@
   }
   .scrollbar-thin::-webkit-scrollbar { width: 8px; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background: oklch(0.86 0.11 220 / 0.25); border-radius: 4px; }
+
+  /* Minecraft-style hover lift + click bounce */
+  .mc-btn { position: relative; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .mc-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -8px oklch(0.86 0.11 220 / 0.5); }
+  .mc-btn:active { transform: translateY(1px) scale(0.98); }
+
+  /* Floating gem burst on click (gold + diamond) */
+  .gem-burst { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+  .gem { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; border-radius: 2px; transform: translate(-50%, -50%); opacity: 0; }
+  .gem.diamond { background: linear-gradient(135deg, #b9f2ff, #5fdfff); box-shadow: 0 0 8px #5fdfff; }
+  .gem.gold { background: linear-gradient(135deg, #ffe066, #ffb700); box-shadow: 0 0 8px #ffd24d; }
+  .gem.emerald { background: linear-gradient(135deg, #7cffb2, #2bd97a); box-shadow: 0 0 8px #4fe89a; }
+  .burst .gem { animation: gem-fly 0.7s cubic-bezier(.22,.9,.3,1) forwards; }
+  .burst .gem:nth-child(1) { --tx: -34px; --ty: -28px; }
+  .burst .gem:nth-child(2) { --tx: 30px; --ty: -32px; animation-delay: 40ms; }
+  .burst .gem:nth-child(3) { --tx: -10px; --ty: -42px; animation-delay: 80ms; }
+  .burst .gem:nth-child(4) { --tx: 22px; --ty: -18px; animation-delay: 120ms; }
+  .burst .gem:nth-child(5) { --tx: -28px; --ty: -10px; animation-delay: 60ms; }
+}
+
+@keyframes gem-fly {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(180deg); }
 }
 
 @keyframes fade-in {
