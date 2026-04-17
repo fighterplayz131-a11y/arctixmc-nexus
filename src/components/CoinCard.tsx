@@ -1,9 +1,9 @@
 import { Coins, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/lib/store-context";
 import type { CoinPack } from "@/lib/store-defaults";
 import { toast } from "sonner";
+import { GemBurstButton } from "@/components/GemBurstButton";
 
 export function CoinCard({ pack }: { pack: CoinPack }) {
   const { addToCart } = useStore();
@@ -18,15 +18,15 @@ export function CoinCard({ pack }: { pack: CoinPack }) {
       <div className="font-display text-3xl font-bold text-foreground mb-1 leading-none">{pack.coins.toLocaleString()}</div>
       <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4 mt-1">Coins</div>
       <div className="text-xl font-bold text-foreground mb-4">रु {pack.price}</div>
-      <Button
+      <GemBurstButton
         onClick={() => {
           addToCart({ id: `coin-${pack.id}`, type: "coins", name: `${pack.coins.toLocaleString()} Coins`, price: pack.price });
           toast.success(`${pack.coins.toLocaleString()} coins added to cart`);
         }}
         className="w-full gradient-primary text-primary-foreground mt-auto"
       >
-        <Plus className="h-4 w-4 mr-1" /> Add to Cart
-      </Button>
+        <Plus className="h-4 w-4" /> Add to Cart
+      </GemBurstButton>
     </div>
   );
 }

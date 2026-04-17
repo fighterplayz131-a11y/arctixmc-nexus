@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      invoices: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_no: number
+          items: Json
+          status: string
+          ticket_id: string | null
+          total: number
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_no?: number
+          items?: Json
+          status?: string
+          ticket_id?: string | null
+          total?: number
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_no?: number
+          items?: Json
+          status?: string
+          ticket_id?: string | null
+          total?: number
+          updated_at?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       store_config: {
         Row: {
           data: Json
@@ -31,6 +75,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ticket_replies: {
+        Row: {
+          author_name: string
+          author_type: string
+          created_at: string
+          id: string
+          message: string
+          ticket_id: string
+        }
+        Insert: {
+          author_name: string
+          author_type: string
+          created_at?: string
+          id?: string
+          message: string
+          ticket_id: string
+        }
+        Update: {
+          author_name?: string
+          author_type?: string
+          created_at?: string
+          id?: string
+          message?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_replies_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tickets: {
         Row: {

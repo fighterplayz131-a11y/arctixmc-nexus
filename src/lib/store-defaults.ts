@@ -68,6 +68,11 @@ export type Settings = {
   featuredSubtitle: string;
   ticketBannerTitle: string;
   ticketBannerText: string;
+  // Stats (editable on homepage)
+  statActivePlayers: string;
+  statUptime: string;
+  statAntiCheat: string;
+  statPlugins: string;
   sections: SectionVisibility;
 };
 
@@ -207,5 +212,9 @@ export const defaultSettings: Settings = {
   featuredSubtitle: "Unlock perks and stand out on the server",
   ticketBannerTitle: "Need Help?",
   ticketBannerText: "Open a support ticket and our staff will get back to you fast.",
+  statActivePlayers: "2,400+",
+  statUptime: "99.9%",
+  statAntiCheat: "Premium",
+  statPlugins: "30+",
   sections: { stats: true, modes: true, discord: true, featured: true },
 };
