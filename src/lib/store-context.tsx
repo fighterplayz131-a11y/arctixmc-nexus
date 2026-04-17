@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   defaultRanks,
   defaultCoins,
@@ -25,10 +26,11 @@ type StoreState = {
   settings: Settings;
   username: string | null;
   cart: CartItem[];
-  setRanks: (r: Rank[]) => void;
-  setCoins: (c: CoinPack[]) => void;
-  setKeys: (k: CrateKey[]) => void;
-  setSettings: (s: Settings) => void;
+  loaded: boolean;
+  setRanks: (r: Rank[]) => Promise<void>;
+  setCoins: (c: CoinPack[]) => Promise<void>;
+  setKeys: (k: CrateKey[]) => Promise<void>;
+  setSettings: (s: Settings) => Promise<void>;
   login: (username: string) => void;
   logout: () => void;
   addToCart: (item: Omit<CartItem, "quantity">) => void;
@@ -39,7 +41,7 @@ type StoreState = {
 
 const StoreCtx = createContext<StoreState | null>(null);
 
-function load<T>(key: string, fallback: T): T {
+function loadLocal<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {
     const raw = localStorage.getItem(key);
@@ -56,35 +58,48 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [settings, setSettingsState] = useState<Settings>(defaultSettings);
   const [username, setUsername] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
+  // Hydrate from local + remote
   useEffect(() => {
-    setRanksState(load("arctix:ranks", defaultRanks));
-    setCoinsState(load("arctix:coins", defaultCoins));
-    setKeysState(load("arctix:keys", defaultKeys));
-    setSettingsState(load("arctix:settings", defaultSettings));
-    setUsername(load<string | null>("arctix:user", null));
-    setCart(load<CartItem[]>("arctix:cart", []));
-    setHydrated(true);
+    setUsername(loadLocal<string | null>("arctix:user", null));
+    setCart(loadLocal<CartItem[]>("arctix:cart", []));
+
+    (async () => {
+      const { data } = await supabase.from("store_config").select("data").eq("id", 1).maybeSingle();
+      const cfg = (data?.data ?? {}) as Partial<{
+        ranks: Rank[]; coins: CoinPack[]; keys: CrateKey[]; settings: Settings;
+      }>;
+      if (cfg.ranks?.length) setRanksState(cfg.ranks);
+      if (cfg.coins?.length) setCoinsState(cfg.coins);
+      if (cfg.keys?.length) setKeysState(cfg.keys);
+      if (cfg.settings) setSettingsState({ ...defaultSettings, ...cfg.settings });
+      setLoaded(true);
+    })();
   }, []);
 
-  useEffect(() => { if (hydrated) localStorage.setItem("arctix:ranks", JSON.stringify(ranks)); }, [ranks, hydrated]);
-  useEffect(() => { if (hydrated) localStorage.setItem("arctix:coins", JSON.stringify(coins)); }, [coins, hydrated]);
-  useEffect(() => { if (hydrated) localStorage.setItem("arctix:keys", JSON.stringify(keys)); }, [keys, hydrated]);
-  useEffect(() => { if (hydrated) localStorage.setItem("arctix:settings", JSON.stringify(settings)); }, [settings, hydrated]);
-  useEffect(() => { if (hydrated) localStorage.setItem("arctix:cart", JSON.stringify(cart)); }, [cart, hydrated]);
+  // Persist cart + user
+  useEffect(() => { if (loaded) localStorage.setItem("arctix:cart", JSON.stringify(cart)); }, [cart, loaded]);
   useEffect(() => {
-    if (!hydrated) return;
+    if (!loaded) return;
     if (username) localStorage.setItem("arctix:user", JSON.stringify(username));
     else localStorage.removeItem("arctix:user");
-  }, [username, hydrated]);
+  }, [username, loaded]);
+
+  const persist = useCallback(async (patch: Record<string, unknown>) => {
+    const next = {
+      ranks, coins, keys, settings,
+      ...patch,
+    };
+    await supabase.from("store_config").upsert({ id: 1, data: next });
+  }, [ranks, coins, keys, settings]);
 
   const value: StoreState = {
-    ranks, coins, keys, settings, username, cart,
-    setRanks: setRanksState,
-    setCoins: setCoinsState,
-    setKeys: setKeysState,
-    setSettings: setSettingsState,
+    ranks, coins, keys, settings, username, cart, loaded,
+    setRanks: async (r) => { setRanksState(r); await persist({ ranks: r }); },
+    setCoins: async (c) => { setCoinsState(c); await persist({ coins: c }); },
+    setKeys: async (k) => { setKeysState(k); await persist({ keys: k }); },
+    setSettings: async (s) => { setSettingsState(s); await persist({ settings: s }); },
     login: (u) => setUsername(u),
     logout: () => setUsername(null),
     addToCart: (item) => setCart((c) => {

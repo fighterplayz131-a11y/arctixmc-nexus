@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, User, LogOut, Menu, X } from "lucide-react";
+import { ShoppingCart, User, LogOut, Menu, X, LifeBuoy } from "lucide-react";
 import { useState } from "react";
 import { useStore } from "@/lib/store-context";
 import { Button } from "@/components/ui/button";
 import { LoginDialog } from "./LoginDialog";
+import { DiscordIcon } from "./DiscordIcon";
 
 export function Navbar() {
   const { cart, username, logout, settings } = useStore();
@@ -14,18 +15,19 @@ export function Navbar() {
   const links = [
     { to: "/", label: "Home" },
     { to: "/store", label: "Store" },
+    { to: "/tickets", label: "Support" },
     { to: "/cart", label: "Cart" },
   ] as const;
 
   return (
     <>
-      <header className="sticky top-0 z-50 glass-strong">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="h-9 w-9 rounded-lg gradient-primary flex items-center justify-center font-display font-bold text-primary-foreground glow-primary group-hover:animate-glow-pulse">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="h-9 w-9 rounded-lg gradient-primary flex items-center justify-center font-display font-bold text-primary-foreground">
               A
             </div>
-            <span className="font-display text-lg font-bold tracking-wider gradient-text">
+            <span className="font-display text-lg font-bold tracking-wider text-foreground">
               {settings.serverName}
             </span>
           </Link>
@@ -35,8 +37,8 @@ export function Navbar() {
               <Link
                 key={l.to}
                 to={l.to}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-primary/5"
-                activeProps={{ className: "px-4 py-2 text-sm font-medium text-primary rounded-md bg-primary/10" }}
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+                activeProps={{ className: "px-3 py-2 text-sm font-medium text-primary rounded-md bg-primary/10" }}
               >
                 {l.label}
               </Link>
@@ -44,17 +46,25 @@ export function Navbar() {
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
-            <Link to="/cart" className="relative p-2 rounded-md hover:bg-primary/10 transition-colors">
+            <a
+              href={settings.discordUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#5865F2]/15 text-[#8a93f5] hover:bg-[#5865F2]/25 transition-colors text-sm font-medium"
+            >
+              <DiscordIcon className="h-4 w-4" /> Discord
+            </a>
+            <Link to="/cart" className="relative p-2 rounded-md hover:bg-muted transition-colors" aria-label="Cart">
               <ShoppingCart className="h-5 w-5 text-foreground" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full gradient-primary text-primary-foreground text-xs font-bold flex items-center justify-center glow-primary">
+                <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </Link>
             {username ? (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-md glass">
+              <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-card/70 border border-border">
                   <User className="h-4 w-4 text-primary" />
                   <span className="text-sm font-medium">{username}</span>
                 </div>
@@ -63,24 +73,35 @@ export function Navbar() {
                 </Button>
               </div>
             ) : (
-              <Button onClick={() => setLoginOpen(true)} variant="default" className="gradient-primary text-primary-foreground hover:opacity-90 glow-primary">
+              <Button onClick={() => setLoginOpen(true)} className="gradient-primary text-primary-foreground">
                 Login
               </Button>
             )}
           </div>
 
-          <button className="md:hidden p-2" onClick={() => setOpen(!open)}>
+          <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X /> : <Menu />}
           </button>
         </div>
 
         {open && (
-          <div className="md:hidden glass-strong border-t border-border px-4 py-4 space-y-2">
+          <div className="md:hidden bg-background border-t border-border px-4 py-4 space-y-2">
             {links.map((l) => (
-              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="block px-4 py-2 rounded-md hover:bg-primary/10">
+              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="block px-4 py-2 rounded-md hover:bg-muted">
                 {l.label}
               </Link>
             ))}
+            <a
+              href={settings.discordUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#5865F2]/15 text-[#8a93f5]"
+            >
+              <DiscordIcon className="h-4 w-4" /> Join Discord
+            </a>
+            <Link to="/tickets" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-muted">
+              <LifeBuoy className="h-4 w-4" /> Support
+            </Link>
             <div className="pt-2 border-t border-border">
               {username ? (
                 <div className="flex items-center justify-between px-4">
