@@ -659,6 +659,16 @@ function HomepageAdmin() {
         </Card>
 
         <Card className="bg-card/70 border-border p-5 space-y-3">
+          <h2 className="font-display text-lg font-bold">Stats Section</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Active Players</Label><Input value={draft.statActivePlayers} onChange={(e) => upd({ statActivePlayers: e.target.value })} placeholder="2,400+" /></div>
+            <div><Label>Uptime</Label><Input value={draft.statUptime} onChange={(e) => upd({ statUptime: e.target.value })} placeholder="99.9%" /></div>
+            <div><Label>Anti-Cheat</Label><Input value={draft.statAntiCheat} onChange={(e) => upd({ statAntiCheat: e.target.value })} placeholder="Premium" /></div>
+            <div><Label>Custom Plugins</Label><Input value={draft.statPlugins} onChange={(e) => upd({ statPlugins: e.target.value })} placeholder="30+" /></div>
+          </div>
+        </Card>
+
+        <Card className="bg-card/70 border-border p-5 space-y-3">
           <h2 className="font-display text-lg font-bold">Section Visibility</h2>
           {(Object.keys(draft.sections) as (keyof Settings["sections"])[]).map((k) => (
             <label key={k} className="flex items-center gap-3 text-sm capitalize">
@@ -668,13 +678,10 @@ function HomepageAdmin() {
           ))}
         </Card>
 
-        <div className="flex gap-2 sticky bottom-4 bg-background/80 backdrop-blur-sm p-3 rounded-lg border border-border">
-          <Button onClick={save} className="gradient-primary text-primary-foreground flex-1">
+        <div className="sticky bottom-4 bg-background/80 backdrop-blur-sm p-3 rounded-lg border border-border">
+          <Button onClick={save} className="gradient-primary text-primary-foreground w-full">
             <Save className="h-4 w-4 mr-1.5" /> Save Homepage
           </Button>
-          <Link to="/" target="_blank">
-            <Button variant="outline"><ImageIcon className="h-4 w-4 mr-1.5" /> Preview</Button>
-          </Link>
         </div>
       </div>
     </div>
