@@ -31,7 +31,7 @@ function CartPage() {
     setSubmitting(true);
     const itemLines = cart.map((i) => `• ${i.name} × ${i.quantity} — रु ${i.price * i.quantity}`).join("\n");
     const description = `Order placed by ${username}\n\nItems:\n${itemLines}\n\nTotal: रु ${total}\n\nPlease deliver these items in-game.`;
-    const { data, error } = await supabase
+    const { data: ticket, error } = await supabase
       .from("tickets")
       .insert({
         username,
@@ -40,14 +40,23 @@ function CartPage() {
         description,
         priority: "normal",
       })
-      .select("ticket_no")
+      .select("id,ticket_no")
       .single();
-    setSubmitting(false);
-    if (error || !data) {
+    if (error || !ticket) {
+      setSubmitting(false);
       toast.error("Could not create order ticket. Please try again.");
       return;
     }
-    toast.success(`Order placed! Ticket #${data.ticket_no} created.`);
+    // Also create invoice record
+    await supabase.from("invoices").insert({
+      username,
+      items: cart.map((i) => ({ id: i.id, name: i.name, type: i.type, price: i.price, quantity: i.quantity })),
+      total,
+      status: "pending",
+      ticket_id: ticket.id,
+    });
+    setSubmitting(false);
+    toast.success(`Order placed! Ticket #${ticket.ticket_no} created.`);
     clearCart();
     setCheckoutOpen(false);
     navigate({ to: "/tickets" });
