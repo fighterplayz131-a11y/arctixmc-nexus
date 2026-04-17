@@ -73,7 +73,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (cfg.ranks?.length) setRanksState(cfg.ranks);
       if (cfg.coins?.length) setCoinsState(cfg.coins);
       if (cfg.keys?.length) setKeysState(cfg.keys);
-      if (cfg.settings) setSettingsState({ ...defaultSettings, ...cfg.settings });
+      if (cfg.settings) setSettingsState({
+        ...defaultSettings,
+        ...cfg.settings,
+        sections: { ...defaultSettings.sections, ...(cfg.settings.sections ?? {}) },
+      });
       setLoaded(true);
     })();
   }, []);
