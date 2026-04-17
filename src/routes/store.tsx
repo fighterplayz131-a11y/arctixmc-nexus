@@ -32,13 +32,13 @@ function StorePage() {
 
       <Tabs defaultValue="ranks" className="w-full">
         <TabsList className="mx-auto flex w-full max-w-md bg-card/70 border border-border h-11 p-1">
-          <TabsTrigger value="ranks" className="flex-1 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground">
+          <TabsTrigger value="ranks" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-foreground">
             <Crown className="h-4 w-4 mr-1.5" /> Ranks
           </TabsTrigger>
-          <TabsTrigger value="coins" className="flex-1 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground">
+          <TabsTrigger value="coins" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-foreground">
             <Coins className="h-4 w-4 mr-1.5" /> Coins
           </TabsTrigger>
-          <TabsTrigger value="keys" className="flex-1 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground">
+          <TabsTrigger value="keys" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-foreground">
             <Key className="h-4 w-4 mr-1.5" /> Keys
           </TabsTrigger>
         </TabsList>

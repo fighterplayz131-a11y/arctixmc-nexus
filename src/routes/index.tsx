@@ -77,10 +77,10 @@ function HomePage() {
         <section className="mx-auto max-w-7xl px-4 md:px-8 -mt-8 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { icon: Users, label: "Active Players", value: "2,400+" },
-              { icon: Zap, label: "Uptime", value: "99.9%" },
-              { icon: Shield, label: "Anti-Cheat", value: "Premium" },
-              { icon: Sparkles, label: "Custom Plugins", value: "30+" },
+              { icon: Users, label: "Active Players", value: settings.statActivePlayers },
+              { icon: Zap, label: "Uptime", value: settings.statUptime },
+              { icon: Shield, label: "Anti-Cheat", value: settings.statAntiCheat },
+              { icon: Sparkles, label: "Custom Plugins", value: settings.statPlugins },
             ].map((s) => (
               <div key={s.label} className="rounded-lg bg-card/80 border border-border p-4 text-center">
                 <s.icon className="h-5 w-5 text-primary mx-auto mb-2" />
