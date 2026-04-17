@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Crown, Check, Plus, ChevronDown } from "lucide-react";
+import { Check, Plus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/lib/store-context";
@@ -13,59 +13,93 @@ export function RankCard({ rank }: { rank: Rank }) {
 
   return (
     <div
-      className="relative group rounded-2xl glass-strong p-6 transition-all hover:-translate-y-1 hover:glow-primary flex flex-col"
-      style={{ borderColor: `${rank.color}40` }}
+      className="relative group rounded-xl bg-card/60 backdrop-blur-sm border transition-all hover:-translate-y-0.5 flex flex-col overflow-hidden"
+      style={{ borderColor: `${rank.color}33` }}
     >
       {rank.tag && (
-        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 gradient-primary text-primary-foreground border-0 glow-primary">
+        <Badge
+          className="absolute top-3 right-3 z-10 border-0 text-xs font-semibold"
+          style={{ background: rank.color, color: "#0b1020" }}
+        >
           {rank.tag}
         </Badge>
       )}
 
-      <div className="flex items-center justify-center mb-4">
-        <div
-          className="h-16 w-16 rounded-2xl flex items-center justify-center"
-          style={{ background: `linear-gradient(135deg, ${rank.color}, ${rank.color}80)`, boxShadow: `0 0 30px ${rank.color}55` }}
-        >
-          <Crown className="h-8 w-8 text-white" />
-        </div>
-      </div>
-
-      <h3 className="text-center font-display text-2xl font-bold tracking-widest mb-1" style={{ color: rank.color }}>
-        {rank.name}
-      </h3>
-
-      <div className="text-center mb-5">
-        <span className="text-sm text-muted-foreground line-through mr-2">रु {rank.price}</span>
-        <span className="text-3xl font-bold gradient-text">रु {rank.discountPrice}</span>
-        {discount > 0 && <div className="text-xs text-primary mt-1">Save {discount}%</div>}
-      </div>
-
-      <ul className="space-y-2 mb-5 flex-1">
-        {(expanded ? rank.perks : rank.perks.slice(0, 4)).map((perk, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-            <Check className="h-4 w-4 mt-0.5 shrink-0" style={{ color: rank.color }} />
-            <span>{perk}</span>
-          </li>
-        ))}
-      </ul>
-
-      {rank.perks.length > 4 && (
-        <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mb-3 flex items-center justify-center gap-1">
-          {expanded ? "Show less" : `Show ${rank.perks.length - 4} more perks`}
-          <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
-        </button>
-      )}
-
-      <Button
-        onClick={() => {
-          addToCart({ id: `rank-${rank.id}`, type: "rank", name: rank.name + " Rank", price: rank.discountPrice });
-          toast.success(`${rank.name} added to cart`);
+      {/* Image */}
+      <div
+        className="h-36 flex items-center justify-center border-b"
+        style={{
+          background: `linear-gradient(135deg, ${rank.color}18, transparent 70%)`,
+          borderColor: `${rank.color}22`,
         }}
-        className="w-full gradient-primary text-primary-foreground hover:opacity-90 glow-primary"
       >
-        <Plus className="h-4 w-4 mr-1" /> Add to Cart
-      </Button>
+        {rank.image ? (
+          <img
+            src={rank.image}
+            alt={`${rank.name} rank`}
+            className="h-28 w-28 object-contain transition-transform group-hover:scale-105"
+            loading="lazy"
+            width={224}
+            height={224}
+          />
+        ) : (
+          <div
+            className="h-20 w-20 rounded-xl flex items-center justify-center text-2xl font-display font-bold"
+            style={{ background: `${rank.color}33`, color: rank.color }}
+          >
+            {rank.name.slice(0, 1)}
+          </div>
+        )}
+      </div>
+
+      <div className="p-5 flex-1 flex flex-col">
+        <h3
+          className="text-center font-display text-xl font-bold tracking-wider mb-1"
+          style={{ color: rank.color }}
+        >
+          {rank.name}
+        </h3>
+
+        <div className="text-center mb-4">
+          <span className="text-xs text-muted-foreground line-through mr-2">रु {rank.price}</span>
+          <span className="text-2xl font-bold text-foreground">रु {rank.discountPrice}</span>
+          {discount > 0 && (
+            <div className="text-[11px] mt-0.5" style={{ color: rank.color }}>
+              Save {discount}%
+            </div>
+          )}
+        </div>
+
+        <ul className="space-y-1.5 mb-4 flex-1">
+          {(expanded ? rank.perks : rank.perks.slice(0, 4)).map((perk, i) => (
+            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+              <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: rank.color }} />
+              <span>{perk}</span>
+            </li>
+          ))}
+        </ul>
+
+        {rank.perks.length > 4 && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs text-muted-foreground hover:text-foreground mb-3 flex items-center justify-center gap-1 transition-colors"
+          >
+            {expanded ? "Show less" : `Show ${rank.perks.length - 4} more`}
+            <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          </button>
+        )}
+
+        <Button
+          onClick={() => {
+            addToCart({ id: `rank-${rank.id}`, type: "rank", name: rank.name + " Rank", price: rank.discountPrice });
+            toast.success(`${rank.name} added to cart`);
+          }}
+          className="w-full font-semibold border-0"
+          style={{ background: rank.color, color: "#0b1020" }}
+        >
+          <Plus className="h-4 w-4 mr-1" /> Add to Cart
+        </Button>
+      </div>
     </div>
   );
 }

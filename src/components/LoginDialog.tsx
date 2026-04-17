@@ -25,10 +25,10 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean; onOpenChang
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong border-primary/20">
+      <DialogContent className="bg-card border-border">
         <DialogHeader>
-          <div className="mx-auto h-14 w-14 rounded-full gradient-primary flex items-center justify-center glow-primary mb-2">
-            <User className="h-7 w-7 text-primary-foreground" />
+          <div className="mx-auto h-12 w-12 rounded-full gradient-primary flex items-center justify-center mb-2">
+            <User className="h-6 w-6 text-primary-foreground" />
           </div>
           <DialogTitle className="text-center font-display tracking-wider">Sign in to ArctixMC</DialogTitle>
           <DialogDescription className="text-center">
@@ -44,7 +44,7 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean; onOpenChang
             className="text-center font-medium tracking-wide"
           />
           {error && <p className="text-xs text-destructive text-center">{error}</p>}
-          <Button type="submit" className="w-full gradient-primary text-primary-foreground glow-primary">
+          <Button type="submit" className="w-full gradient-primary text-primary-foreground">
             Continue
           </Button>
         </form>
