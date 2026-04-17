@@ -33,14 +33,42 @@ export type CrateKey = {
   active?: boolean;
 };
 
+export type SectionVisibility = {
+  stats: boolean;
+  modes: boolean;
+  discord: boolean;
+  featured: boolean;
+};
+
 export type Settings = {
   serverName: string;
   serverIp: string;
   heroTitle: string;
   heroSubtitle: string;
+  copyIpLabel: string;
+  storeCtaText: string;
+  discordCtaText: string;
   primaryColor: string;
   discordUrl: string;
-  glowIntensity: number; // 0-100
+  glowIntensity: number;
+  heroOverlay: number; // 0-100 darkness
+  heroBackgroundUrl?: string;
+  // Section copy
+  modesTitle: string;
+  modesSubtitle: string;
+  survivalTitle: string;
+  survivalText: string;
+  lifestealTitle: string;
+  lifestealText: string;
+  pvpTitle: string;
+  pvpText: string;
+  discordTitle: string;
+  discordText: string;
+  featuredTitle: string;
+  featuredSubtitle: string;
+  ticketBannerTitle: string;
+  ticketBannerText: string;
+  sections: SectionVisibility;
 };
 
 export const defaultRanks: Rank[] = [
@@ -156,8 +184,28 @@ export const defaultSettings: Settings = {
   serverName: "ArctixMC",
   serverIp: "play.arctixmc.net",
   heroTitle: "Welcome to ArctixMC",
-  heroSubtitle: "The Ultimate Survival Experience",
+  heroSubtitle: "A premium Minecraft network — Survival, Lifesteal & PvP. Forge your legend in the frozen realm.",
+  copyIpLabel: "Server IP",
+  storeCtaText: "Visit Store",
+  discordCtaText: "Join Discord",
   primaryColor: "#8AEFFF",
   discordUrl: "https://discord.gg/arctixmc",
-  glowIntensity: 35,
+  glowIntensity: 25,
+  heroOverlay: 60,
+  heroBackgroundUrl: "",
+  modesTitle: "Game Modes",
+  modesSubtitle: "Live now and coming soon",
+  survivalTitle: "Survival Season 1",
+  survivalText: "Build, explore and thrive in a fresh world with custom enchants, land claims and a rich economy.",
+  lifestealTitle: "Lifesteal",
+  lifestealText: "Steal hearts, build alliances, and survive the most intense PvP economy.",
+  pvpTitle: "PvP Practice",
+  pvpText: "Sharpen your skills with crystal, sumo, build-uhc and ranked duels.",
+  discordTitle: "Join our Discord",
+  discordText: "Get support, find teammates, and stay updated on new seasons, events and giveaways. Our staff team responds fast.",
+  featuredTitle: "Featured Ranks",
+  featuredSubtitle: "Unlock perks and stand out on the server",
+  ticketBannerTitle: "Need Help?",
+  ticketBannerText: "Open a support ticket and our staff will get back to you fast.",
+  sections: { stats: true, modes: true, discord: true, featured: true },
 };

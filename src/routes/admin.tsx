@@ -8,10 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { Lock, LogOut, Plus, Trash2, Save, Eye, Upload } from "lucide-react";
+import { Lock, LogOut, Plus, Trash2, Save, Eye, Upload, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { StatusBadge } from "./tickets";
-import type { Rank, CoinPack, CrateKey } from "@/lib/store-defaults";
+import type { Rank, CoinPack, CrateKey, Settings } from "@/lib/store-defaults";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — ArctixMC" }, { name: "robots", content: "noindex" }] }),
@@ -120,12 +120,14 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       <div className="mx-auto max-w-7xl px-4 md:px-8 py-6">
         <Tabs defaultValue="ranks">
           <TabsList className="bg-card/70 border border-border flex-wrap h-auto">
+            <TabsTrigger value="homepage">Homepage</TabsTrigger>
             <TabsTrigger value="ranks">Ranks</TabsTrigger>
             <TabsTrigger value="coins">Coins</TabsTrigger>
             <TabsTrigger value="keys">Crate Keys</TabsTrigger>
             <TabsTrigger value="tickets">Tickets</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
+          <TabsContent value="homepage" className="mt-5"><HomepageAdmin /></TabsContent>
           <TabsContent value="ranks" className="mt-5"><RanksAdmin /></TabsContent>
           <TabsContent value="coins" className="mt-5"><CoinsAdmin /></TabsContent>
           <TabsContent value="keys" className="mt-5"><KeysAdmin /></TabsContent>
@@ -371,18 +373,127 @@ function SettingsAdmin() {
 
   return (
     <Card className="bg-card/70 border-border p-6 space-y-4 max-w-2xl">
-      <h2 className="font-display text-lg font-bold">Store Settings</h2>
+      <h2 className="font-display text-lg font-bold">Global Settings</h2>
       <div className="grid gap-4">
         <div><Label>Server Name</Label><Input value={draft.serverName} onChange={(e) => setDraft({ ...draft, serverName: e.target.value })} /></div>
         <div><Label>Server IP</Label><Input value={draft.serverIp} onChange={(e) => setDraft({ ...draft, serverIp: e.target.value })} /></div>
-        <div><Label>Hero Title</Label><Input value={draft.heroTitle} onChange={(e) => setDraft({ ...draft, heroTitle: e.target.value })} /></div>
-        <div><Label>Hero Subtitle</Label><Input value={draft.heroSubtitle} onChange={(e) => setDraft({ ...draft, heroSubtitle: e.target.value })} /></div>
         <div><Label>Discord Invite URL</Label><Input value={draft.discordUrl} onChange={(e) => setDraft({ ...draft, discordUrl: e.target.value })} /></div>
         <div><Label>Primary Color</Label><Input type="color" value={draft.primaryColor} onChange={(e) => setDraft({ ...draft, primaryColor: e.target.value })} className="h-10 p-1 w-32" /></div>
+        <div>
+          <Label>Glow Intensity ({draft.glowIntensity}%)</Label>
+          <input type="range" min={0} max={100} value={draft.glowIntensity} onChange={(e) => setDraft({ ...draft, glowIntensity: +e.target.value })} className="w-full" />
+        </div>
       </div>
       <Button onClick={() => { setSettings(draft); toast.success("Settings saved"); }} className="gradient-primary text-primary-foreground">
         <Save className="h-4 w-4 mr-1.5" /> Save Settings
       </Button>
     </Card>
+  );
+}
+
+function HomepageAdmin() {
+  const { settings, setSettings } = useStore();
+  const [draft, setDraft] = useState<Settings>(settings);
+  const [uploading, setUploading] = useState(false);
+  useEffect(() => setDraft(settings), [settings]);
+
+  const upd = (patch: Partial<Settings>) => setDraft({ ...draft, ...patch });
+  const updSection = (k: keyof Settings["sections"], v: boolean) =>
+    setDraft({ ...draft, sections: { ...draft.sections, [k]: v } });
+
+  async function uploadBg(file: File) {
+    setUploading(true);
+    const path = `homepage-bg-${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("rank-images").upload(path, file, { upsert: true });
+    if (error) { toast.error(error.message); setUploading(false); return; }
+    const { data } = supabase.storage.from("rank-images").getPublicUrl(path);
+    upd({ heroBackgroundUrl: data.publicUrl });
+    setUploading(false);
+    toast.success("Background uploaded");
+  }
+
+  function save() { setSettings(draft); toast.success("Homepage saved — preview live below"); }
+
+  return (
+    <div className="grid lg:grid-cols-[1fr_1fr] gap-5">
+      <div className="space-y-5">
+        <Card className="bg-card/70 border-border p-5 space-y-4">
+          <h2 className="font-display text-lg font-bold">Hero Section</h2>
+          <div><Label>Hero Title</Label><Input value={draft.heroTitle} onChange={(e) => upd({ heroTitle: e.target.value })} /></div>
+          <div><Label>Hero Subtitle</Label><Textarea rows={2} value={draft.heroSubtitle} onChange={(e) => upd({ heroSubtitle: e.target.value })} /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Copy IP Label</Label><Input value={draft.copyIpLabel} onChange={(e) => upd({ copyIpLabel: e.target.value })} /></div>
+            <div><Label>Server IP</Label><Input value={draft.serverIp} onChange={(e) => upd({ serverIp: e.target.value })} /></div>
+            <div><Label>Store CTA</Label><Input value={draft.storeCtaText} onChange={(e) => upd({ storeCtaText: e.target.value })} /></div>
+            <div><Label>Discord CTA</Label><Input value={draft.discordCtaText} onChange={(e) => upd({ discordCtaText: e.target.value })} /></div>
+          </div>
+          <div>
+            <Label>Background Image URL</Label>
+            <Input value={draft.heroBackgroundUrl ?? ""} onChange={(e) => upd({ heroBackgroundUrl: e.target.value })} placeholder="Leave blank for default icy mountains" />
+            <label className="cursor-pointer mt-2 inline-block">
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadBg(f); }} />
+              <Button asChild variant="outline" size="sm"><span><Upload className="h-3 w-3 mr-1" /> {uploading ? "Uploading…" : "Upload Background"}</span></Button>
+            </label>
+          </div>
+          <div>
+            <Label>Overlay Darkness ({draft.heroOverlay}%)</Label>
+            <input type="range" min={0} max={100} value={draft.heroOverlay} onChange={(e) => upd({ heroOverlay: +e.target.value })} className="w-full" />
+          </div>
+        </Card>
+
+        <Card className="bg-card/70 border-border p-5 space-y-4">
+          <h2 className="font-display text-lg font-bold">Game Modes Section</h2>
+          <div><Label>Section Title</Label><Input value={draft.modesTitle} onChange={(e) => upd({ modesTitle: e.target.value })} /></div>
+          <div><Label>Section Subtitle</Label><Input value={draft.modesSubtitle} onChange={(e) => upd({ modesSubtitle: e.target.value })} /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Survival Title</Label><Input value={draft.survivalTitle} onChange={(e) => upd({ survivalTitle: e.target.value })} /></div>
+            <div><Label>Lifesteal Title</Label><Input value={draft.lifestealTitle} onChange={(e) => upd({ lifestealTitle: e.target.value })} /></div>
+          </div>
+          <div><Label>Survival Text</Label><Textarea rows={2} value={draft.survivalText} onChange={(e) => upd({ survivalText: e.target.value })} /></div>
+          <div><Label>Lifesteal Text</Label><Textarea rows={2} value={draft.lifestealText} onChange={(e) => upd({ lifestealText: e.target.value })} /></div>
+          <div><Label>PvP Title</Label><Input value={draft.pvpTitle} onChange={(e) => upd({ pvpTitle: e.target.value })} /></div>
+          <div><Label>PvP Text</Label><Textarea rows={2} value={draft.pvpText} onChange={(e) => upd({ pvpText: e.target.value })} /></div>
+        </Card>
+      </div>
+
+      <div className="space-y-5">
+        <Card className="bg-card/70 border-border p-5 space-y-4">
+          <h2 className="font-display text-lg font-bold">Discord Section</h2>
+          <div><Label>Title</Label><Input value={draft.discordTitle} onChange={(e) => upd({ discordTitle: e.target.value })} /></div>
+          <div><Label>Description</Label><Textarea rows={3} value={draft.discordText} onChange={(e) => upd({ discordText: e.target.value })} /></div>
+        </Card>
+
+        <Card className="bg-card/70 border-border p-5 space-y-4">
+          <h2 className="font-display text-lg font-bold">Featured Ranks Section</h2>
+          <div><Label>Title</Label><Input value={draft.featuredTitle} onChange={(e) => upd({ featuredTitle: e.target.value })} /></div>
+          <div><Label>Subtitle</Label><Input value={draft.featuredSubtitle} onChange={(e) => upd({ featuredSubtitle: e.target.value })} /></div>
+        </Card>
+
+        <Card className="bg-card/70 border-border p-5 space-y-4">
+          <h2 className="font-display text-lg font-bold">Support Banner</h2>
+          <div><Label>Title</Label><Input value={draft.ticketBannerTitle} onChange={(e) => upd({ ticketBannerTitle: e.target.value })} /></div>
+          <div><Label>Text</Label><Textarea rows={2} value={draft.ticketBannerText} onChange={(e) => upd({ ticketBannerText: e.target.value })} /></div>
+        </Card>
+
+        <Card className="bg-card/70 border-border p-5 space-y-3">
+          <h2 className="font-display text-lg font-bold">Section Visibility</h2>
+          {(Object.keys(draft.sections) as (keyof Settings["sections"])[]).map((k) => (
+            <label key={k} className="flex items-center gap-3 text-sm capitalize">
+              <input type="checkbox" checked={draft.sections[k]} onChange={(e) => updSection(k, e.target.checked)} />
+              Show {k} section
+            </label>
+          ))}
+        </Card>
+
+        <div className="flex gap-2 sticky bottom-4 bg-background/80 backdrop-blur-sm p-3 rounded-lg border border-border">
+          <Button onClick={save} className="gradient-primary text-primary-foreground flex-1">
+            <Save className="h-4 w-4 mr-1.5" /> Save Homepage
+          </Button>
+          <Link to="/" target="_blank">
+            <Button variant="outline"><ImageIcon className="h-4 w-4 mr-1.5" /> Preview</Button>
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }

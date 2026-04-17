@@ -7,13 +7,13 @@ import { toast } from "sonner";
 export function KeyCard({ item }: { item: CrateKey }) {
   const { addToCart } = useStore();
   return (
-    <div className="rounded-xl bg-card/60 border border-border p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 flex flex-col">
+    <div className="rounded-xl bg-card/80 border border-border p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 flex flex-col">
       <div className="h-12 w-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-3">
         <Key className="h-6 w-6 text-primary" />
       </div>
-      <h3 className="font-display text-lg font-bold mb-2">{item.name}</h3>
-      <p className="text-sm text-muted-foreground mb-4 flex-1">{item.description}</p>
-      <div className="flex items-center justify-between gap-2">
+      <h3 className="font-display text-lg font-bold mb-2 text-foreground leading-tight">{item.name}</h3>
+      <p className="text-sm text-muted-foreground mb-4 flex-1 leading-relaxed">{item.description}</p>
+      <div className="flex items-center justify-between gap-2 pt-2 border-t border-border">
         <span className="text-xl font-bold text-foreground">रु {item.price}</span>
         <Button
           size="sm"
