@@ -51,9 +51,8 @@ export type Settings = {
   primaryColor: string;
   discordUrl: string;
   glowIntensity: number;
-  heroOverlay: number; // 0-100 darkness
+  heroOverlay: number;
   heroBackgroundUrl?: string;
-  // Section copy
   modesTitle: string;
   modesSubtitle: string;
   survivalTitle: string;
@@ -68,7 +67,6 @@ export type Settings = {
   featuredSubtitle: string;
   ticketBannerTitle: string;
   ticketBannerText: string;
-  // Stats (editable on homepage)
   statActivePlayers: string;
   statUptime: string;
   statAntiCheat: string;
@@ -77,6 +75,23 @@ export type Settings = {
   faqs: { q: string; a: string }[];
   supportTitle: string;
   supportSubtitle: string;
+  // NEW — support section copy (admin-editable)
+  supportRules: string[];
+  paymentHelpTitle: string;
+  paymentHelpText: string;
+  paymentMethods: { name: string; note: string }[];
+  responseTimeText: string;
+  supportActive: boolean;
+  // NEW — daily reward
+  dailyRewardCoins: number;
+  dailyRewardEnabled: boolean;
+  // NEW — loyalty
+  loyaltyPointsPerRupee: number;
+  // NEW — referral
+  referralRewardCoins: number;
+  referralEnabled: boolean;
+  // NEW — defaults theme
+  defaultTheme: "dark" | "light";
 };
 
 export const defaultRanks: Rank[] = [
@@ -229,4 +244,27 @@ export const defaultSettings: Settings = {
     { q: "How do I report a player or bug?", a: "Open a ticket under Bug Report or Staff Help with screenshots/video links and full details. We review reports within 24 hours." },
     { q: "When does Lifesteal/PvP launch?", a: "Lifesteal and PvP Practice are coming soon. Follow our Discord for the official launch dates and beta access." },
   ],
+  supportRules: [
+    "Don't spam tickets — open one ticket per issue.",
+    "Don't make false claims about purchases — fraud results in a ban.",
+    "Provide screenshots when reporting bugs or payment issues.",
+    "Be respectful to staff. Rude tickets may be closed.",
+    "Allow up to 24 hours for a reply during peak times.",
+  ],
+  paymentHelpTitle: "Payment Help",
+  paymentHelpText: "If your payment failed or your item didn't arrive within 30 minutes, open a Purchase Issue ticket with your transaction ID and a screenshot.",
+  paymentMethods: [
+    { name: "eSewa", note: "Instant — auto-delivered" },
+    { name: "Khalti", note: "Instant — auto-delivered" },
+    { name: "IME Pay", note: "Instant — auto-delivered" },
+    { name: "Credit / Debit Card", note: "Processed via secure gateway" },
+  ],
+  responseTimeText: "Average reply time: under 2 hours during 9am–11pm NPT.",
+  supportActive: true,
+  dailyRewardCoins: 100,
+  dailyRewardEnabled: true,
+  loyaltyPointsPerRupee: 1,
+  referralRewardCoins: 500,
+  referralEnabled: true,
+  defaultTheme: "dark",
 };

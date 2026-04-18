@@ -14,6 +14,207 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          active: boolean
+          body: string | null
+          created_at: string
+          ends_at: string | null
+          id: string
+          starts_at: string
+          title: string
+          variant: string
+        }
+        Insert: {
+          active?: boolean
+          body?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          starts_at?: string
+          title: string
+          variant?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          starts_at?: string
+          title?: string
+          variant?: string
+        }
+        Relationships: []
+      }
+      bundles: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          items: Json
+          name: string
+          original_price: number
+          price: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          items?: Json
+          name: string
+          original_price?: number
+          price?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          items?: Json
+          name?: string
+          original_price?: number
+          price?: number
+        }
+        Relationships: []
+      }
+      coupon_redemptions: {
+        Row: {
+          coupon_id: string
+          created_at: string
+          id: string
+          invoice_id: string | null
+          username: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          username: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_redemptions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          used_count: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          used_count?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          used_count?: number
+        }
+        Relationships: []
+      }
+      daily_rewards: {
+        Row: {
+          amount: number
+          claimed_at: string
+          id: string
+          reward_type: string
+          username: string
+        }
+        Insert: {
+          amount?: number
+          claimed_at?: string
+          id?: string
+          reward_type?: string
+          username: string
+        }
+        Update: {
+          amount?: number
+          claimed_at?: string
+          id?: string
+          reward_type?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      flash_sales: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          discount_percent: number
+          ends_at: string
+          id: string
+          starts_at: string
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          discount_percent?: number
+          ends_at: string
+          id?: string
+          starts_at?: string
+          title: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          discount_percent?: number
+          ends_at?: string
+          id?: string
+          starts_at?: string
+          title?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           created_at: string
@@ -58,6 +259,104 @@ export type Database = {
           },
         ]
       }
+      loyalty_ledger: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_id: string | null
+          points: number
+          reason: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          points: number
+          reason: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          points?: number
+          reason?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_ledger_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          loyalty_points: number
+          referral_code: string | null
+          referred_by: string | null
+          total_spent: number
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          loyalty_points?: number
+          referral_code?: string | null
+          referred_by?: string | null
+          total_spent?: number
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          loyalty_points?: number
+          referral_code?: string | null
+          referred_by?: string | null
+          total_spent?: number
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referred_username: string
+          referrer_username: string
+          reward_granted: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referred_username: string
+          referrer_username: string
+          reward_granted?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referred_username?: string
+          referrer_username?: string
+          reward_granted?: boolean
+        }
+        Relationships: []
+      }
       store_config: {
         Row: {
           data: Json
@@ -75,6 +374,57 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ticket_attachments: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number
+          file_url: string
+          id: string
+          mime_type: string | null
+          reply_id: string | null
+          ticket_id: string | null
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_size?: number
+          file_url: string
+          id?: string
+          mime_type?: string | null
+          reply_id?: string | null
+          ticket_id?: string | null
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          file_url?: string
+          id?: string
+          mime_type?: string | null
+          reply_id?: string | null
+          ticket_id?: string | null
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_attachments_reply_id_fkey"
+            columns: ["reply_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_replies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_attachments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ticket_replies: {
         Row: {
@@ -174,6 +524,36 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      wishlist: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          item_name: string
+          item_price: number
+          item_type: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          item_name: string
+          item_price?: number
+          item_type: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          item_name?: string
+          item_price?: number
+          item_type?: string
+          username?: string
         }
         Relationships: []
       }

@@ -1,10 +1,13 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation, useSearch } from "@tanstack/react-router";
+import { useEffect } from "react";
 import appCss from "../styles.css?url";
-import { StoreProvider } from "@/lib/store-context";
+import { StoreProvider, useStore } from "@/lib/store-context";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { PageTransition } from "@/components/PageTransition";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { WishlistProvider } from "@/lib/wishlist-context";
 
 function NotFoundComponent() {
   return (
@@ -53,18 +56,43 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ReferralCapture() {
+  const search = useSearch({ strict: false }) as { ref?: string };
+  useEffect(() => {
+    if (search?.ref) {
+      try { localStorage.setItem("arctix:ref", search.ref); } catch { /* ignore */ }
+    }
+  }, [search?.ref]);
+  return null;
+}
+
+function ThemeApplier() {
+  useEffect(() => {
+    const saved = localStorage.getItem("arctix:theme");
+    if (saved === "light") document.documentElement.classList.add("light");
+    else document.documentElement.classList.remove("light");
+  }, []);
+  return null;
+}
+
 function Layout() {
   const loc = useLocation();
   const isAdmin = loc.pathname.startsWith("/admin");
+  const { username } = useStore();
   return (
-    <div className="flex min-h-screen flex-col">
-      {!isAdmin && <Navbar />}
-      <main className="flex-1">
-        {isAdmin ? <Outlet /> : <PageTransition><Outlet /></PageTransition>}
-      </main>
-      {!isAdmin && <Footer />}
-      <Toaster position="top-right" theme="dark" />
-    </div>
+    <WishlistProvider username={username}>
+      <div className="flex min-h-screen flex-col">
+        <ThemeApplier />
+        <ReferralCapture />
+        {!isAdmin && <AnnouncementBanner />}
+        {!isAdmin && <Navbar />}
+        <main className="flex-1">
+          {isAdmin ? <Outlet /> : <PageTransition><Outlet /></PageTransition>}
+        </main>
+        {!isAdmin && <Footer />}
+        <Toaster position="top-right" theme="dark" />
+      </div>
+    </WishlistProvider>
   );
 }
 
