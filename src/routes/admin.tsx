@@ -586,7 +586,7 @@ function SettingsAdmin() {
 }
 
 function HomepageAdmin() {
-  const { settings, setSettings } = useStore();
+  const { settings, setSettings, coins, keys } = useStore();
   const [draft, setDraft] = useState<Settings>(settings);
   const [uploading, setUploading] = useState(false);
   useEffect(() => setDraft(settings), [settings]);
@@ -744,19 +744,40 @@ function HomepageAdmin() {
           </label>
           <div><Label>Section Title</Label><Input value={draft.highlightsTitle ?? ""} onChange={(e) => upd({ highlightsTitle: e.target.value })} /></div>
           <div><Label>Subtitle</Label><Input value={draft.highlightsSubtitle ?? ""} onChange={(e) => upd({ highlightsSubtitle: e.target.value })} /></div>
-          <HighlightPicker
-            label="Featured Coin Packages"
-            options={useStore.getState ? [] : []}
-            type="coins"
-            selected={draft.highlightCoinIds ?? []}
-            onChange={(ids) => upd({ highlightCoinIds: ids })}
-          />
-          <HighlightPicker
-            label="Featured Crate Keys"
-            type="keys"
-            selected={draft.highlightKeyIds ?? []}
-            onChange={(ids) => upd({ highlightKeyIds: ids })}
-          />
+          <div>
+            <Label className="text-xs mb-2 block">Featured Coin Packages</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {coins.map((c) => {
+                const checked = (draft.highlightCoinIds ?? []).includes(c.id);
+                return (
+                  <label key={c.id} className="flex items-center gap-2 text-xs rounded-md border border-border bg-muted/20 p-2 cursor-pointer">
+                    <input type="checkbox" checked={checked} onChange={(e) => {
+                      const cur = draft.highlightCoinIds ?? [];
+                      upd({ highlightCoinIds: e.target.checked ? [...cur, c.id] : cur.filter((x) => x !== c.id) });
+                    }} />
+                    <span>{c.coins.toLocaleString()} coins · रु {c.price}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs mb-2 block">Featured Crate Keys</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {keys.map((k) => {
+                const checked = (draft.highlightKeyIds ?? []).includes(k.id);
+                return (
+                  <label key={k.id} className="flex items-center gap-2 text-xs rounded-md border border-border bg-muted/20 p-2 cursor-pointer">
+                    <input type="checkbox" checked={checked} onChange={(e) => {
+                      const cur = draft.highlightKeyIds ?? [];
+                      upd({ highlightKeyIds: e.target.checked ? [...cur, k.id] : cur.filter((x) => x !== k.id) });
+                    }} />
+                    <span>{k.name} · रु {k.price}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
         </Card>
 
         <Card className="bg-card/70 border-border p-5 space-y-3">
