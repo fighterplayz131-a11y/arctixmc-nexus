@@ -329,24 +329,6 @@ function HomePage() {
         </section>
       )}
 
-      {/* Featured Store */}
-      {settings.sections.featured && (
-        <section className="mx-auto max-w-7xl px-4 md:px-8 pb-12">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">{settings.featuredTitle}</h2>
-              <p className="text-muted-foreground mt-1 text-sm">{settings.featuredSubtitle}</p>
-            </div>
-            <Link to="/store" className="hidden md:inline-flex">
-              <Button variant="outline" className="bg-card/60 border-border">View All →</Button>
-            </Link>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {featured.map((r) => <RankCard key={r.id} rank={r} />)}
-          </div>
-        </section>
-      )}
-
       {/* Ticket banner */}
       <section className="mx-auto max-w-7xl px-4 md:px-8 pb-16">
         <div className="rounded-2xl bg-card/70 border border-border p-6 md:p-8 grid md:grid-cols-[1fr_auto] gap-5 items-center">
