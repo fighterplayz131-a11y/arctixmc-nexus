@@ -83,6 +83,36 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Live Player Count + Server Status */}
+      {settings.livePlayersEnabled && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6">
+          <div className="rounded-xl bg-card/80 border border-border p-4 md:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className={`h-3 w-3 rounded-full ${statusStyle.dot} ring-4 ${statusStyle.ring}`} />
+                <div className={`absolute inset-0 h-3 w-3 rounded-full ${statusStyle.dot} animate-ping opacity-75`} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className={`font-display font-bold ${statusStyle.text}`}>{statusStyle.label}</span>
+                  <span className="text-xs text-muted-foreground">— {settings.serverStatusText}</span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">{settings.serverIp}</div>
+              </div>
+            </div>
+            <div className="flex items-center justify-start md:justify-end gap-3">
+              <Activity className="h-5 w-5 text-primary" />
+              <div>
+                <div className="font-display text-2xl font-bold text-foreground leading-none">
+                  {settings.livePlayersCount.toLocaleString()}
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1">{settings.livePlayersLabel}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Flash sales + Daily reward strip */}
       <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6 space-y-3">
         <FlashSaleStrip />
