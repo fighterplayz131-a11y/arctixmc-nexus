@@ -18,6 +18,7 @@ export function Navbar() {
     { to: "/", label: "Home" },
     { to: "/store", label: "Store" },
     { to: "/tickets", label: "Support" },
+    { to: "/profile", label: "Profile" },
     { to: "/cart", label: "Cart" },
   ] as const;
 
