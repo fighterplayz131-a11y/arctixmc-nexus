@@ -164,7 +164,7 @@ function HomePage() {
           )}
           {highlightedKeys.length > 0 && (
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {highlightedKeys.map((k) => <KeyCard key={k.id} crateKey={k} />)}
+              {highlightedKeys.map((k) => <KeyCard key={k.id} item={k} />)}
             </div>
           )}
           <div className="text-center mt-8">
