@@ -51,9 +51,8 @@ export type Settings = {
   primaryColor: string;
   discordUrl: string;
   glowIntensity: number;
-  heroOverlay: number; // 0-100 darkness
+  heroOverlay: number;
   heroBackgroundUrl?: string;
-  // Section copy
   modesTitle: string;
   modesSubtitle: string;
   survivalTitle: string;
@@ -68,7 +67,6 @@ export type Settings = {
   featuredSubtitle: string;
   ticketBannerTitle: string;
   ticketBannerText: string;
-  // Stats (editable on homepage)
   statActivePlayers: string;
   statUptime: string;
   statAntiCheat: string;
@@ -77,6 +75,23 @@ export type Settings = {
   faqs: { q: string; a: string }[];
   supportTitle: string;
   supportSubtitle: string;
+  // NEW — support section copy (admin-editable)
+  supportRules: string[];
+  paymentHelpTitle: string;
+  paymentHelpText: string;
+  paymentMethods: { name: string; note: string }[];
+  responseTimeText: string;
+  supportActive: boolean;
+  // NEW — daily reward
+  dailyRewardCoins: number;
+  dailyRewardEnabled: boolean;
+  // NEW — loyalty
+  loyaltyPointsPerRupee: number;
+  // NEW — referral
+  referralRewardCoins: number;
+  referralEnabled: boolean;
+  // NEW — defaults theme
+  defaultTheme: "dark" | "light";
 };
 
 export const defaultRanks: Rank[] = [
