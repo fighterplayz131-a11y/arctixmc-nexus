@@ -92,6 +92,28 @@ export type Settings = {
   referralEnabled: boolean;
   // NEW — defaults theme
   defaultTheme: "dark" | "light";
+  // NEW — Live player count + server status
+  livePlayersEnabled: boolean;
+  livePlayersCount: number;
+  livePlayersLabel: string;
+  serverStatus: "online" | "offline" | "maintenance";
+  serverStatusText: string;
+  // NEW — Coins & Store highlights
+  highlightsEnabled: boolean;
+  highlightsTitle: string;
+  highlightsSubtitle: string;
+  highlightCoinIds: string[];   // ids from coins
+  highlightKeyIds: string[];    // ids from keys
+  // NEW — Why Choose section
+  whyChooseEnabled: boolean;
+  whyChooseTitle: string;
+  whyChooseSubtitle: string;
+  whyChooseFeatures: { icon: string; title: string; text: string }[];
+  // NEW — Events section
+  eventsEnabled: boolean;
+  eventsTitle: string;
+  eventsSubtitle: string;
+  events: { title: string; description: string; date: string; status: "live" | "upcoming" | "ended"; image?: string }[];
 };
 
 export const defaultRanks: Rank[] = [
@@ -267,4 +289,30 @@ export const defaultSettings: Settings = {
   referralRewardCoins: 500,
   referralEnabled: true,
   defaultTheme: "dark",
+  livePlayersEnabled: true,
+  livePlayersCount: 247,
+  livePlayersLabel: "players online right now",
+  serverStatus: "online",
+  serverStatusText: "All systems operational",
+  highlightsEnabled: true,
+  highlightsTitle: "Coins & Store Highlights",
+  highlightsSubtitle: "The most popular packages players are grabbing right now",
+  highlightCoinIds: ["c3", "c5"],
+  highlightKeyIds: ["k2", "k4"],
+  whyChooseEnabled: true,
+  whyChooseTitle: "Why Choose ArctixMC",
+  whyChooseSubtitle: "Built for serious Minecraft players — no lag, no pay-to-win nonsense.",
+  whyChooseFeatures: [
+    { icon: "Zap", title: "Lag-Free Gameplay", text: "Premium hardware with low-latency networking across NPT region." },
+    { icon: "Sparkles", title: "Custom Plugins", text: "Hand-crafted plugins, custom enchants, kits and dungeons you won't find elsewhere." },
+    { icon: "Shield", title: "Active Anti-Cheat", text: "Premium anti-cheat with manual moderation. Cheaters get banned fast." },
+    { icon: "Users", title: "Active Staff", text: "Friendly staff online 9am–11pm NPT. Tickets answered in under 2 hours." },
+  ],
+  eventsEnabled: true,
+  eventsTitle: "Server Events",
+  eventsSubtitle: "Don't miss what's happening this season",
+  events: [
+    { title: "Build Battle Weekend", description: "Compete in 1v1 build battles for 10,000 coins prize pool.", date: "Every Saturday 7pm NPT", status: "live" },
+    { title: "Lifesteal Beta Launch", description: "Closed beta for ranked players — gather hearts, conquer bases.", date: "Coming next month", status: "upcoming" },
+  ],
 };

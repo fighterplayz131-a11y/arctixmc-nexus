@@ -4,12 +4,17 @@ import { CopyIp } from "@/components/CopyIp";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RankCard } from "@/components/RankCard";
+import { CoinCard } from "@/components/CoinCard";
+import { KeyCard } from "@/components/KeyCard";
 import { DiscordIcon } from "@/components/DiscordIcon";
 import { IcyBackground } from "@/components/IcyBackground";
 import { DailyReward } from "@/components/DailyReward";
 import { FlashSaleStrip } from "@/components/FlashSaleStrip";
-import { Sparkles, Swords, Heart, Users, Zap, Shield, MessagesSquare, LifeBuoy } from "lucide-react";
+import { Sparkles, Swords, Heart, Users, Zap, Shield, MessagesSquare, LifeBuoy, Activity, Trophy, Calendar, Clock, CheckCircle2, Award, Gift } from "lucide-react";
 import heroImage from "@/assets/hero-mountains.jpg";
+
+const ICONS: Record<string, typeof Zap> = { Zap, Sparkles, Shield, Users, Award, Trophy, Activity, Heart, Swords, Gift };
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,10 +31,20 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { settings, ranks } = useStore();
+  const { settings, ranks, coins, keys } = useStore();
   const featured = ranks.slice(0, 3);
   const bg = settings.heroBackgroundUrl || heroImage;
   const overlayAlpha = Math.min(0.95, Math.max(0, (settings.heroOverlay ?? 60) / 100));
+
+  const highlightedCoins = coins.filter((c) => settings.highlightCoinIds?.includes(c.id) && c.visible !== false);
+  const highlightedKeys = keys.filter((k) => settings.highlightKeyIds?.includes(k.id) && k.active !== false);
+
+  const statusStyle =
+    settings.serverStatus === "online"
+      ? { dot: "bg-emerald-400", text: "text-emerald-300", ring: "ring-emerald-400/40", label: "Online" }
+      : settings.serverStatus === "maintenance"
+      ? { dot: "bg-amber-400", text: "text-amber-300", ring: "ring-amber-400/40", label: "Maintenance" }
+      : { dot: "bg-rose-500", text: "text-rose-300", ring: "ring-rose-400/40", label: "Offline" };
 
   return (
     <div className="animate-fade-in">
@@ -78,6 +93,36 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Live Player Count + Server Status */}
+      {settings.livePlayersEnabled && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6">
+          <div className="rounded-xl bg-card/80 border border-border p-4 md:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className={`h-3 w-3 rounded-full ${statusStyle.dot} ring-4 ${statusStyle.ring}`} />
+                <div className={`absolute inset-0 h-3 w-3 rounded-full ${statusStyle.dot} animate-ping opacity-75`} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className={`font-display font-bold ${statusStyle.text}`}>{statusStyle.label}</span>
+                  <span className="text-xs text-muted-foreground">— {settings.serverStatusText}</span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">{settings.serverIp}</div>
+              </div>
+            </div>
+            <div className="flex items-center justify-start md:justify-end gap-3">
+              <Activity className="h-5 w-5 text-primary" />
+              <div>
+                <div className="font-display text-2xl font-bold text-foreground leading-none">
+                  {settings.livePlayersCount.toLocaleString()}
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1">{settings.livePlayersLabel}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Flash sales + Daily reward strip */}
       <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6 space-y-3">
         <FlashSaleStrip />
@@ -103,6 +148,86 @@ function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Coins & Store Highlights */}
+      {settings.highlightsEnabled && (highlightedCoins.length > 0 || highlightedKeys.length > 0) && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
+          <div className="text-center mb-8">
+            <Badge className="mb-3 bg-primary/10 border border-primary/30 text-primary"><Trophy className="h-3 w-3 mr-1" /> Most Popular</Badge>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2 text-foreground">{settings.highlightsTitle}</h2>
+            <p className="text-muted-foreground text-sm">{settings.highlightsSubtitle}</p>
+          </div>
+          {highlightedCoins.length > 0 && (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {highlightedCoins.map((c) => <CoinCard key={c.id} pack={c} />)}
+            </div>
+          )}
+          {highlightedKeys.length > 0 && (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {highlightedKeys.map((k) => <KeyCard key={k.id} item={k} />)}
+            </div>
+          )}
+          <div className="text-center mt-8">
+            <Link to="/store">
+              <Button variant="outline" className="bg-card/60 border-border">Browse full store →</Button>
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* Why Choose ArctixMC */}
+      {settings.whyChooseEnabled && settings.whyChooseFeatures?.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2 text-foreground">{settings.whyChooseTitle}</h2>
+            <p className="text-muted-foreground text-sm max-w-xl mx-auto">{settings.whyChooseSubtitle}</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {settings.whyChooseFeatures.map((f, i) => {
+              const Icon = ICONS[f.icon] ?? CheckCircle2;
+              return (
+                <div key={i} className="rounded-xl bg-card/80 border border-border p-5 hover:border-primary/40 transition-colors">
+                  <div className="h-11 w-11 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center mb-3">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="font-display font-bold text-foreground mb-1.5">{f.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{f.text}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Event Highlights */}
+      {settings.eventsEnabled && settings.events?.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
+          <div className="text-center mb-8">
+            <Badge className="mb-3 bg-primary/10 border border-primary/30 text-primary"><Calendar className="h-3 w-3 mr-1" /> Events</Badge>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2 text-foreground">{settings.eventsTitle}</h2>
+            <p className="text-muted-foreground text-sm">{settings.eventsSubtitle}</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {settings.events.map((ev, i) => {
+              const tone =
+                ev.status === "live" ? { badge: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", label: "Live now" }
+                : ev.status === "upcoming" ? { badge: "bg-amber-500/15 text-amber-300 border-amber-500/30", label: "Upcoming" }
+                : { badge: "bg-muted text-muted-foreground border-border", label: "Ended" };
+              return (
+                <div key={i} className="rounded-xl bg-card/80 border border-border p-5 hover:border-primary/40 transition-colors">
+                  <div className="flex items-center justify-between mb-3">
+                    <Badge variant="outline" className={`border ${tone.badge}`}>{tone.label}</Badge>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> {ev.date}</div>
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-foreground mb-1">{ev.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{ev.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
 
       {/* Modes */}
       {settings.sections.modes && (
