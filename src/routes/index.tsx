@@ -31,10 +31,20 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { settings, ranks } = useStore();
+  const { settings, ranks, coins, keys } = useStore();
   const featured = ranks.slice(0, 3);
   const bg = settings.heroBackgroundUrl || heroImage;
   const overlayAlpha = Math.min(0.95, Math.max(0, (settings.heroOverlay ?? 60) / 100));
+
+  const highlightedCoins = coins.filter((c) => settings.highlightCoinIds?.includes(c.id) && c.visible !== false);
+  const highlightedKeys = keys.filter((k) => settings.highlightKeyIds?.includes(k.id) && k.active !== false);
+
+  const statusStyle =
+    settings.serverStatus === "online"
+      ? { dot: "bg-emerald-400", text: "text-emerald-300", ring: "ring-emerald-400/40", label: "Online" }
+      : settings.serverStatus === "maintenance"
+      ? { dot: "bg-amber-400", text: "text-amber-300", ring: "ring-amber-400/40", label: "Maintenance" }
+      : { dot: "bg-rose-500", text: "text-rose-300", ring: "ring-rose-400/40", label: "Offline" };
 
   return (
     <div className="animate-fade-in">
