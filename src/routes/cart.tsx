@@ -3,10 +3,12 @@ import { useState } from "react";
 import { useStore } from "@/lib/store-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Trash2, Minus, Plus, ShoppingBag, CreditCard } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Trash2, Minus, Plus, ShoppingBag, CreditCard, Tag, Users, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { LoginDialog } from "@/components/LoginDialog";
 import { toast } from "sonner";
+import { validateCoupon, applyCoupon, type Coupon } from "@/lib/coupons";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "Cart — ArctixMC" }] }),
