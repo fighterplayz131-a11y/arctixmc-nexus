@@ -74,6 +74,9 @@ export type Settings = {
   statAntiCheat: string;
   statPlugins: string;
   sections: SectionVisibility;
+  faqs: { q: string; a: string }[];
+  supportTitle: string;
+  supportSubtitle: string;
 };
 
 export const defaultRanks: Rank[] = [
@@ -217,4 +220,13 @@ export const defaultSettings: Settings = {
   statAntiCheat: "Premium",
   statPlugins: "30+",
   sections: { stats: true, modes: true, discord: true, featured: true },
+  supportTitle: "Support Center",
+  supportSubtitle: "Need help? Browse common questions or open a ticket — our staff replies fast.",
+  faqs: [
+    { q: "How do I receive my rank after purchase?", a: "Ranks are delivered automatically within a few minutes of payment. If it hasn't arrived in 30 minutes, open a Purchase Issue ticket with your in-game username." },
+    { q: "What payment methods do you accept?", a: "We accept eSewa, Khalti, IME Pay, and major credit/debit cards through our checkout flow." },
+    { q: "Can I refund my purchase?", a: "Refunds are only issued in the case of a duplicate charge or undelivered item. Please open a ticket with your invoice number." },
+    { q: "How do I report a player or bug?", a: "Open a ticket under Bug Report or Staff Help with screenshots/video links and full details. We review reports within 24 hours." },
+    { q: "When does Lifesteal/PvP launch?", a: "Lifesteal and PvP Practice are coming soon. Follow our Discord for the official launch dates and beta access." },
+  ],
 };
