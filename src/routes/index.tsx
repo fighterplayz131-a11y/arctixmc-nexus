@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RankCard } from "@/components/RankCard";
 import { DiscordIcon } from "@/components/DiscordIcon";
+import { IcyBackground } from "@/components/IcyBackground";
 import { Sparkles, Swords, Heart, Users, Zap, Shield, MessagesSquare, LifeBuoy } from "lucide-react";
 import heroImage from "@/assets/hero-mountains.jpg";
 
@@ -32,18 +33,21 @@ function HomePage() {
     <div className="animate-fade-in">
       {/* Hero — Minecraft icy biome */}
       <section className="relative overflow-hidden">
+        {/* Layered cinematic image */}
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center opacity-70"
           style={{ backgroundImage: `url(${bg})` }}
           aria-hidden="true"
         />
+        {/* Animated parallax mountains + snow over the image */}
+        <IcyBackground />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background: `linear-gradient(180deg, oklch(0.15 0.03 255 / ${overlayAlpha * 0.85}), oklch(0.15 0.03 255 / ${overlayAlpha}) 70%, oklch(0.15 0.03 255) 100%)`,
           }}
         />
-        <div className="absolute inset-0 mc-grid opacity-40 pointer-events-none" />
+        <div className="absolute inset-0 mc-grid opacity-30 pointer-events-none" />
         <div className="relative mx-auto max-w-7xl px-4 md:px-8 pt-20 pb-24 md:pt-28 md:pb-28 text-center">
           <Badge className="mb-6 bg-primary/10 border border-primary/30 text-primary px-3 py-1">
             <Sparkles className="h-3 w-3 mr-1.5" /> Season 1 — Now Live
