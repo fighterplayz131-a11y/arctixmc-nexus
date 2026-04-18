@@ -668,6 +668,35 @@ function HomepageAdmin() {
           </div>
         </Card>
 
+        <Card className="bg-card/70 border-border p-5 space-y-4">
+          <h2 className="font-display text-lg font-bold">Support Page</h2>
+          <div><Label>Page Title</Label><Input value={draft.supportTitle} onChange={(e) => upd({ supportTitle: e.target.value })} /></div>
+          <div><Label>Page Subtitle</Label><Textarea rows={2} value={draft.supportSubtitle} onChange={(e) => upd({ supportSubtitle: e.target.value })} /></div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>FAQs ({draft.faqs.length})</Label>
+              <Button size="sm" variant="outline" onClick={() => upd({ faqs: [...draft.faqs, { q: "New question", a: "Answer here" }] })}>
+                <Plus className="h-3 w-3 mr-1" /> Add FAQ
+              </Button>
+            </div>
+            {draft.faqs.map((f, i) => (
+              <div key={i} className="rounded-md border border-border bg-muted/20 p-3 space-y-2">
+                <div className="flex gap-2">
+                  <Input className="flex-1" placeholder="Question" value={f.q} onChange={(e) => {
+                    const next = [...draft.faqs]; next[i] = { ...next[i], q: e.target.value }; upd({ faqs: next });
+                  }} />
+                  <Button size="icon" variant="ghost" className="text-destructive shrink-0" onClick={() => upd({ faqs: draft.faqs.filter((_, j) => j !== i) })}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <Textarea rows={2} placeholder="Answer" value={f.a} onChange={(e) => {
+                  const next = [...draft.faqs]; next[i] = { ...next[i], a: e.target.value }; upd({ faqs: next });
+                }} />
+              </div>
+            ))}
+          </div>
+        </Card>
+
         <Card className="bg-card/70 border-border p-5 space-y-3">
           <h2 className="font-display text-lg font-bold">Section Visibility</h2>
           {(Object.keys(draft.sections) as (keyof Settings["sections"])[]).map((k) => (
