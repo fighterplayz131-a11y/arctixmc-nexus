@@ -252,7 +252,8 @@ function TicketThread({ ticket, onBack, authorName }: { ticket: Ticket; onBack: 
         </div>
         <h2 className="font-display text-xl font-bold text-foreground mb-1">{ticket.subject}</h2>
         <div className="text-xs text-muted-foreground mb-3">{ticket.category} · {ticket.username} · {new Date(ticket.created_at).toLocaleString()}</div>
-        <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{ticket.description}</p>
+        <TicketStatusTracker status={ticket.status} />
+        <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed mt-2">{ticket.description}</p>
       </div>
 
       <div className="rounded-xl bg-card/60 border border-border p-5">
