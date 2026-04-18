@@ -5,6 +5,7 @@ import { useStore } from "@/lib/store-context";
 import { Button } from "@/components/ui/button";
 import { LoginDialog } from "./LoginDialog";
 import { DiscordIcon } from "./DiscordIcon";
+import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/arctix-logo.png";
 
 export function Navbar() {
