@@ -20,8 +20,24 @@ function CartPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<Coupon | null>(null);
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const navigate = useNavigate();
-  const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  const discount = coupon ? applyCoupon(coupon, subtotal) : 0;
+  const total = Math.max(0, subtotal - discount);
+
+  async function applyCouponCode() {
+    setCouponBusy(true);
+    const res = await validateCoupon(couponCode);
+    setCouponBusy(false);
+    if (!res.ok) { toast.error(res.error); return; }
+    setCoupon(res.coupon);
+    toast.success(`Coupon ${res.coupon.code} applied!`);
+  }
+  function removeCoupon() { setCoupon(null); setCouponCode(""); }
 
   function handleCheckout() {
     if (!username) { setLoginOpen(true); return; }
