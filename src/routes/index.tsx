@@ -4,12 +4,17 @@ import { CopyIp } from "@/components/CopyIp";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RankCard } from "@/components/RankCard";
+import { CoinCard } from "@/components/CoinCard";
+import { KeyCard } from "@/components/KeyCard";
 import { DiscordIcon } from "@/components/DiscordIcon";
 import { IcyBackground } from "@/components/IcyBackground";
 import { DailyReward } from "@/components/DailyReward";
 import { FlashSaleStrip } from "@/components/FlashSaleStrip";
-import { Sparkles, Swords, Heart, Users, Zap, Shield, MessagesSquare, LifeBuoy } from "lucide-react";
+import { Sparkles, Swords, Heart, Users, Zap, Shield, MessagesSquare, LifeBuoy, Activity, Trophy, Calendar, Clock, CheckCircle2, Award, Gift } from "lucide-react";
 import heroImage from "@/assets/hero-mountains.jpg";
+
+const ICONS: Record<string, typeof Zap> = { Zap, Sparkles, Shield, Users, Award, Trophy, Activity, Heart, Swords, Gift };
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
