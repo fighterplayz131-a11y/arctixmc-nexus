@@ -13,7 +13,7 @@ export function SupportFAQ() {
         <h2 className="font-display text-lg font-bold text-foreground">Frequently Asked Questions</h2>
       </div>
       <Accordion type="single" collapsible className="w-full">
-        {faqs.map((f, i) => (
+        {faqs.map((f: { q: string; a: string }, i: number) => (
           <AccordionItem key={i} value={`f-${i}`} className="border-border">
             <AccordionTrigger className="text-left text-sm font-medium hover:text-primary">{f.q}</AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{f.a}</AccordionContent>

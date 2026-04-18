@@ -111,8 +111,8 @@
   .scrollbar-thin::-webkit-scrollbar-thumb { background: oklch(0.86 0.11 220 / 0.25); border-radius: 4px; }
 
   /* Minecraft-style hover lift + click bounce */
-  .mc-btn { position: relative; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-  .mc-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -8px oklch(0.86 0.11 220 / 0.5); }
+  .mc-btn { position: relative; transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease; }
+  .mc-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -8px oklch(0.86 0.11 220 / 0.5); filter: brightness(1.06); }
   .mc-btn:active { transform: translateY(1px) scale(0.98); }
 
   /* Floating gem burst on click (gold + diamond) */
@@ -127,6 +127,101 @@
   .burst .gem:nth-child(3) { --tx: -10px; --ty: -42px; animation-delay: 80ms; }
   .burst .gem:nth-child(4) { --tx: 22px; --ty: -18px; animation-delay: 120ms; }
   .burst .gem:nth-child(5) { --tx: -28px; --ty: -10px; animation-delay: 60ms; }
+
+  /* ============ Custom Cursor (clickables) ============ */
+  /* SVG-based pixel sword cursor on interactive elements */
+  a, button, [role="button"], .mc-btn, label[for], summary, select, [data-cursor="pointer"] {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23b9f2ff'/><stop offset='1' stop-color='%235fdfff'/></linearGradient></defs><rect x='3' y='3' width='4' height='4' fill='%238b5a2b'/><rect x='6' y='6' width='3' height='3' fill='%23a06a32'/><rect x='8' y='8' width='3' height='3' fill='url(%23g)' stroke='%23000' stroke-width='0.5'/><rect x='11' y='11' width='3' height='3' fill='url(%23g)' stroke='%23000' stroke-width='0.5'/><rect x='14' y='14' width='3' height='3' fill='url(%23g)' stroke='%23000' stroke-width='0.5'/><rect x='17' y='17' width='3' height='3' fill='url(%23g)' stroke='%23000' stroke-width='0.5'/><rect x='20' y='20' width='3' height='3' fill='url(%23g)' stroke='%23000' stroke-width='0.5'/></svg>") 4 4, pointer;
+  }
+  input, textarea { cursor: text; }
+
+  /* ============ Icy Background (parallax mountains + snow) ============ */
+  .icy-bg {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, oklch(0.86 0.11 220 / 0.18), transparent 70%),
+      linear-gradient(180deg, oklch(0.18 0.035 258), oklch(0.13 0.025 255));
+  }
+  .mc-mountains { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 50%; will-change: transform; }
+  .mc-mountains-far { opacity: 0.55; bottom: 25%; height: 45%; animation: drift-far 60s ease-in-out infinite alternate; }
+  .mc-mountains-mid { opacity: 0.75; bottom: 10%; height: 50%; animation: drift-mid 45s ease-in-out infinite alternate; }
+  .mc-mountains-near { opacity: 1; bottom: 0; height: 55%; animation: drift-near 35s ease-in-out infinite alternate; }
+  @keyframes drift-far { from { transform: translateX(-1.5%); } to { transform: translateX(1.5%); } }
+  @keyframes drift-mid { from { transform: translateX(2%); } to { transform: translateX(-2%); } }
+  @keyframes drift-near { from { transform: translateX(-2.5%); } to { transform: translateX(2.5%); } }
+
+  /* Snow layers — pure CSS, GPU only */
+  .snow {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.55;
+    background-repeat: repeat;
+    will-change: transform;
+  }
+  .snow-1 {
+    background-image: radial-gradient(circle at 10% 20%, #fff 0.8px, transparent 1.2px),
+                      radial-gradient(circle at 70% 60%, #fff 0.8px, transparent 1.2px),
+                      radial-gradient(circle at 40% 80%, #fff 0.8px, transparent 1.2px);
+    background-size: 200px 200px;
+    animation: snow-fall 22s linear infinite;
+  }
+  .snow-2 {
+    background-image: radial-gradient(circle at 30% 40%, #cfefff 1px, transparent 1.5px),
+                      radial-gradient(circle at 80% 10%, #cfefff 1px, transparent 1.5px);
+    background-size: 280px 280px;
+    animation: snow-fall 32s linear infinite;
+    opacity: 0.4;
+  }
+  .snow-3 {
+    background-image: radial-gradient(circle at 50% 50%, #fff 1.4px, transparent 2px);
+    background-size: 360px 360px;
+    animation: snow-fall 44s linear infinite;
+    opacity: 0.3;
+  }
+  @keyframes snow-fall {
+    from { transform: translate3d(0, -100px, 0); }
+    to { transform: translate3d(20px, 100vh, 0); }
+  }
+
+  /* ============ Page transition (slide + shake) ============ */
+  .page-anim { animation: slide-shake 0.45s cubic-bezier(.22,.9,.3,1) both; will-change: transform, opacity; }
+  @keyframes slide-shake {
+    0% { opacity: 0; transform: translateX(40px); }
+    60% { opacity: 1; transform: translateX(-6px); }
+    78% { transform: translateX(4px); }
+    90% { transform: translateX(-2px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ============ Pixel block-wipe overlay ============ */
+  .block-wipe {
+    position: fixed; inset: 0; z-index: 100; pointer-events: none;
+    display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(4, 1fr);
+    opacity: 0;
+  }
+  .block-wipe span {
+    background: oklch(0.18 0.035 258);
+    border: 1px solid oklch(0.86 0.11 220 / 0.15);
+    transform: scale(0);
+    transform-origin: center;
+  }
+  .block-wipe.wiping { opacity: 1; }
+  .block-wipe.wiping span {
+    animation: pixel-wipe 0.55s cubic-bezier(.5,0,.5,1) forwards;
+  }
+  @keyframes pixel-wipe {
+    0% { transform: scale(0); opacity: 0; }
+    40% { transform: scale(1); opacity: 1; }
+    60% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0); opacity: 0; }
+  }
+
+  /* ============ Smooth scroll ============ */
+  html { scroll-behavior: smooth; }
+
+  /* Reduce-motion: disable heavy effects */
+  @media (prefers-reduced-motion: reduce) {
+    .mc-mountains, .snow, .page-anim, .block-wipe span { animation: none !important; }
+    .page-anim { transform: none; opacity: 1; }
+  }
 }
 
 @keyframes gem-fly {
