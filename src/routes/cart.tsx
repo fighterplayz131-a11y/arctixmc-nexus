@@ -141,9 +141,38 @@ function CartPage() {
             <div className="space-y-2 mb-4 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Items ({cart.reduce((s, i) => s + i.quantity, 0)})</span>
-                <span>रु {total}</span>
+                <span>रु {subtotal}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-emerald-400">
+                  <span>Discount ({coupon?.code})</span>
+                  <span>− रु {discount}</span>
+                </div>
+              )}
             </div>
+
+            {/* Coupon */}
+            <div className="mb-3">
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1"><Tag className="h-3 w-3" /> Coupon code</label>
+              {coupon ? (
+                <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-md bg-emerald-500/10 border border-emerald-500/30">
+                  <span className="text-sm font-mono text-emerald-300">{coupon.code}</span>
+                  <button onClick={removeCoupon} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input value={couponCode} onChange={(e) => setCouponCode(e.target.value)} placeholder="SUMMER20" className="h-9 uppercase font-mono text-sm" />
+                  <Button onClick={applyCouponCode} disabled={couponBusy || !couponCode.trim()} variant="outline" className="h-9 shrink-0">Apply</Button>
+                </div>
+              )}
+            </div>
+
+            {/* Referral */}
+            <div className="mb-4">
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1"><Users className="h-3 w-3" /> Referral code (optional)</label>
+              <Input value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder="FRIEND-AB12" className="h-9 uppercase font-mono text-sm" />
+            </div>
+
             <div className="border-t border-border pt-4 flex justify-between items-baseline mb-5">
               <span className="font-semibold">Total</span>
               <span className="font-display text-xl font-bold text-foreground">रु {total}</span>
