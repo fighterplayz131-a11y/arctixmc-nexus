@@ -19,7 +19,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
     const t1 = window.setTimeout(() => {
       setKey(loc.pathname);
       setWiping(false);
-    }, 280);
+    }, 120);
     return () => window.clearTimeout(t1);
   }, [loc.pathname]);
 
@@ -27,7 +27,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
     <>
       <div key={key} className="page-anim">{children}</div>
       <div className={`block-wipe ${wiping ? "wiping" : ""}`} aria-hidden="true">
-        {Array.from({ length: 24 }).map((_, i) => <span key={i} style={{ animationDelay: `${(i % 6) * 18}ms` }} />)}
+        {Array.from({ length: 12 }).map((_, i) => <span key={i} style={{ animationDelay: `${(i % 4) * 10}ms` }} />)}
       </div>
     </>
   );
