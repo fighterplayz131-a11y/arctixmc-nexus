@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { LifeBuoy, CheckCircle2, Search, Send, MessageCircle, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import { GemBurstButton } from "@/components/GemBurstButton";
+import { SupportFAQ, TicketStatusTracker } from "@/components/SupportFAQ";
 
 export const Route = createFileRoute("/tickets")({
   head: () => ({ meta: [{ title: "Support Tickets — ArctixMC" }] }),
@@ -53,7 +54,7 @@ type Reply = {
 };
 
 function TicketsPage() {
-  const { username } = useStore();
+  const { username, settings } = useStore();
   const [submitted, setSubmitted] = useState<{ no: number; id: string } | null>(null);
   const [form, setForm] = useState({
     username: username ?? "",
@@ -114,14 +115,16 @@ function TicketsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 md:px-8 py-12 animate-fade-in">
-      <div className="text-center mb-8">
+    <div className="mx-auto max-w-5xl px-4 md:px-8 py-12 animate-fade-in space-y-8">
+      <div className="text-center mb-2">
         <div className="mx-auto h-12 w-12 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center mb-3">
           <LifeBuoy className="h-6 w-6 text-primary" />
         </div>
-        <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">Support Tickets</h1>
-        <p className="text-muted-foreground text-sm">Need help? Create a ticket and our staff will get back to you.</p>
+        <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">{settings.supportTitle}</h1>
+        <p className="text-muted-foreground text-sm max-w-xl mx-auto">{settings.supportSubtitle}</p>
       </div>
+
+      <SupportFAQ />
 
       <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6">
         {/* Form / Success */}
@@ -249,7 +252,8 @@ function TicketThread({ ticket, onBack, authorName }: { ticket: Ticket; onBack: 
         </div>
         <h2 className="font-display text-xl font-bold text-foreground mb-1">{ticket.subject}</h2>
         <div className="text-xs text-muted-foreground mb-3">{ticket.category} · {ticket.username} · {new Date(ticket.created_at).toLocaleString()}</div>
-        <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{ticket.description}</p>
+        <TicketStatusTracker status={ticket.status} />
+        <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed mt-2">{ticket.description}</p>
       </div>
 
       <div className="rounded-xl bg-card/60 border border-border p-5">

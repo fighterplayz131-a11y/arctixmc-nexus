@@ -4,6 +4,7 @@ import { StoreProvider } from "@/lib/store-context";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { PageTransition } from "@/components/PageTransition";
 
 function NotFoundComponent() {
   return (
@@ -59,7 +60,7 @@ function Layout() {
     <div className="flex min-h-screen flex-col">
       {!isAdmin && <Navbar />}
       <main className="flex-1">
-        <Outlet />
+        {isAdmin ? <Outlet /> : <PageTransition><Outlet /></PageTransition>}
       </main>
       {!isAdmin && <Footer />}
       <Toaster position="top-right" theme="dark" />
