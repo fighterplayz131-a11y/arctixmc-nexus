@@ -13,6 +13,7 @@ import { Lock, LogOut, Plus, Trash2, Save, Eye, Upload, Send, FileText } from "l
 import { toast } from "sonner";
 import { StatusBadge } from "./tickets";
 import type { Rank, CoinPack, CrateKey, Settings } from "@/lib/store-defaults";
+import { CouponsAdmin, BundlesAdmin, FlashSalesAdmin, AnnouncementsAdmin, RewardsSettingsAdmin } from "@/components/admin/AdminExtras";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — ArctixMC" }, { name: "robots", content: "noindex" }] }),
