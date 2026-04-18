@@ -4,11 +4,13 @@ import { useStore } from "@/lib/store-context";
 import type { CoinPack } from "@/lib/store-defaults";
 import { toast } from "sonner";
 import { GemBurstButton } from "@/components/GemBurstButton";
+import { WishlistHeart } from "@/components/WishlistHeart";
 
 export function CoinCard({ pack }: { pack: CoinPack }) {
   const { addToCart } = useStore();
   return (
     <div className="relative rounded-xl bg-card/80 border border-border p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40 text-center flex flex-col">
+      <WishlistHeart itemId={`coin-${pack.id}`} itemType="coins" itemName={`${pack.coins.toLocaleString()} Coins`} itemPrice={pack.price} />
       {pack.bonus && (
         <Badge className="absolute top-3 right-3 bg-amber-400 text-amber-950 border-0 font-semibold">{pack.bonus}</Badge>
       )}

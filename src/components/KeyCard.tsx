@@ -3,11 +3,13 @@ import { useStore } from "@/lib/store-context";
 import type { CrateKey } from "@/lib/store-defaults";
 import { toast } from "sonner";
 import { GemBurstButton } from "@/components/GemBurstButton";
+import { WishlistHeart } from "@/components/WishlistHeart";
 
 export function KeyCard({ item }: { item: CrateKey }) {
   const { addToCart } = useStore();
   return (
-    <div className="rounded-xl bg-card/80 border border-border p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 flex flex-col">
+    <div className="relative rounded-xl bg-card/80 border border-border p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 flex flex-col">
+      <WishlistHeart itemId={`key-${item.id}`} itemType="key" itemName={item.name} itemPrice={item.price} />
       <div className="h-12 w-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-3">
         <Key className="h-6 w-6 text-primary" />
       </div>
