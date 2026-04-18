@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { RankCard } from "@/components/RankCard";
 import { DiscordIcon } from "@/components/DiscordIcon";
 import { IcyBackground } from "@/components/IcyBackground";
+import { DailyReward } from "@/components/DailyReward";
+import { FlashSaleStrip } from "@/components/FlashSaleStrip";
 import { Sparkles, Swords, Heart, Users, Zap, Shield, MessagesSquare, LifeBuoy } from "lucide-react";
 import heroImage from "@/assets/hero-mountains.jpg";
 
@@ -76,9 +78,15 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Flash sales + Daily reward strip */}
+      <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6 space-y-3">
+        <FlashSaleStrip />
+        <DailyReward />
+      </section>
+
       {/* Stats */}
       {settings.sections.stats && (
-        <section className="mx-auto max-w-7xl px-4 md:px-8 -mt-8 relative">
+        <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { icon: Users, label: "Active Players", value: settings.statActivePlayers },

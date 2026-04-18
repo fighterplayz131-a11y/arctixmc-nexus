@@ -5,17 +5,22 @@ import { useStore } from "@/lib/store-context";
 import type { Rank } from "@/lib/store-defaults";
 import { toast } from "sonner";
 import { GemBurstButton } from "@/components/GemBurstButton";
+import { WishlistHeart } from "@/components/WishlistHeart";
+import { useRankUpgrade } from "@/lib/use-rank-upgrade";
+import { ArrowUpCircle } from "lucide-react";
 
 export function RankCard({ rank }: { rank: Rank }) {
-  const { addToCart } = useStore();
+  const { addToCart, ranks } = useStore();
   const [expanded, setExpanded] = useState(false);
   const discount = Math.round(((rank.price - rank.discountPrice) / rank.price) * 100);
+  const upgrade = useRankUpgrade(rank, ranks);
 
   return (
     <div
       className="relative group rounded-xl bg-card/80 border transition-all hover:-translate-y-0.5 flex flex-col overflow-hidden"
       style={{ borderColor: `${rank.color}40` }}
     >
+      <WishlistHeart itemId={`rank-${rank.id}`} itemType="rank" itemName={`${rank.name} Rank`} itemPrice={rank.discountPrice} />
       {rank.tag && (
         <Badge
           className="absolute top-3 right-3 z-10 border-0 text-[10px] font-bold tracking-wider px-2 py-0.5"
@@ -90,14 +95,26 @@ export function RankCard({ rank }: { rank: Rank }) {
 
         <GemBurstButton
           onClick={() => {
-            addToCart({ id: `rank-${rank.id}`, type: "rank", name: rank.name + " Rank", price: rank.discountPrice });
-            toast.success(`${rank.name} added to cart`);
+            const isUpgrade = upgrade.canUpgrade;
+            const price = isUpgrade ? upgrade.upgradePrice : rank.discountPrice;
+            const name = isUpgrade ? `Upgrade ${upgrade.fromRank?.name} → ${rank.name}` : `${rank.name} Rank`;
+            addToCart({ id: `rank-${rank.id}`, type: "rank", name, price });
+            toast.success(isUpgrade ? `Upgrade added (pay only रु ${price})` : `${rank.name} added to cart`);
           }}
           className="w-full font-semibold border-0"
           style={{ background: rank.color, color: "#0b1020" }}
         >
-          <Plus className="h-4 w-4" /> Add to Cart
+          {upgrade.canUpgrade ? (
+            <><ArrowUpCircle className="h-4 w-4" /> Upgrade — रु {upgrade.upgradePrice}</>
+          ) : (
+            <><Plus className="h-4 w-4" /> Add to Cart</>
+          )}
         </GemBurstButton>
+        {upgrade.canUpgrade && (
+          <div className="text-[10px] text-muted-foreground text-center mt-1.5">
+            From {upgrade.fromRank?.name} — save रु {rank.discountPrice - upgrade.upgradePrice}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -3,10 +3,12 @@ import { useState } from "react";
 import { useStore } from "@/lib/store-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Trash2, Minus, Plus, ShoppingBag, CreditCard } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Trash2, Minus, Plus, ShoppingBag, CreditCard, Tag, Users, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { LoginDialog } from "@/components/LoginDialog";
 import { toast } from "sonner";
+import { validateCoupon, applyCoupon, type Coupon } from "@/lib/coupons";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "Cart — ArctixMC" }] }),
@@ -18,8 +20,24 @@ function CartPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<Coupon | null>(null);
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const navigate = useNavigate();
-  const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  const discount = coupon ? applyCoupon(coupon, subtotal) : 0;
+  const total = Math.max(0, subtotal - discount);
+
+  async function applyCouponCode() {
+    setCouponBusy(true);
+    const res = await validateCoupon(couponCode);
+    setCouponBusy(false);
+    if (!res.ok) { toast.error(res.error); return; }
+    setCoupon(res.coupon);
+    toast.success(`Coupon ${res.coupon.code} applied!`);
+  }
+  function removeCoupon() { setCoupon(null); setCouponCode(""); }
 
   function handleCheckout() {
     if (!username) { setLoginOpen(true); return; }
@@ -48,13 +66,35 @@ function CartPage() {
       return;
     }
     // Also create invoice record
-    await supabase.from("invoices").insert({
+    const { data: invoice } = await supabase.from("invoices").insert({
       username,
       items: cart.map((i) => ({ id: i.id, name: i.name, type: i.type, price: i.price, quantity: i.quantity })),
       total,
       status: "pending",
       ticket_id: ticket.id,
-    });
+    }).select("id").single();
+
+    // Record coupon redemption + bump used_count
+    if (coupon && invoice) {
+      await supabase.from("coupon_redemptions").insert({ coupon_id: coupon.id, username, invoice_id: invoice.id });
+      await supabase.from("coupons").update({ used_count: coupon.used_count + 1 }).eq("id", coupon.id);
+    }
+
+    // Record referral if user typed a code
+    const refCode = referralCode.trim();
+    if (refCode) {
+      const { data: refProfile } = await supabase.from("profiles").select("username").eq("referral_code", refCode.toUpperCase()).maybeSingle();
+      if (refProfile && refProfile.username !== username) {
+        await supabase.from("referrals").insert({
+          referrer_username: refProfile.username,
+          referred_username: username,
+          reward_granted: false,
+        });
+        toast.success(`Referral by ${refProfile.username} recorded!`);
+      } else if (!refProfile) {
+        toast.error("Referral code not found (order still placed)");
+      }
+    }
     setSubmitting(false);
     toast.success(`Order placed! Ticket #${ticket.ticket_no} created.`);
     clearCart();
@@ -101,9 +141,38 @@ function CartPage() {
             <div className="space-y-2 mb-4 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Items ({cart.reduce((s, i) => s + i.quantity, 0)})</span>
-                <span>रु {total}</span>
+                <span>रु {subtotal}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-emerald-400">
+                  <span>Discount ({coupon?.code})</span>
+                  <span>− रु {discount}</span>
+                </div>
+              )}
             </div>
+
+            {/* Coupon */}
+            <div className="mb-3">
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1"><Tag className="h-3 w-3" /> Coupon code</label>
+              {coupon ? (
+                <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-md bg-emerald-500/10 border border-emerald-500/30">
+                  <span className="text-sm font-mono text-emerald-300">{coupon.code}</span>
+                  <button onClick={removeCoupon} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input value={couponCode} onChange={(e) => setCouponCode(e.target.value)} placeholder="SUMMER20" className="h-9 uppercase font-mono text-sm" />
+                  <Button onClick={applyCouponCode} disabled={couponBusy || !couponCode.trim()} variant="outline" className="h-9 shrink-0">Apply</Button>
+                </div>
+              )}
+            </div>
+
+            {/* Referral */}
+            <div className="mb-4">
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1"><Users className="h-3 w-3" /> Referral code (optional)</label>
+              <Input value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder="FRIEND-AB12" className="h-9 uppercase font-mono text-sm" />
+            </div>
+
             <div className="border-t border-border pt-4 flex justify-between items-baseline mb-5">
               <span className="font-semibold">Total</span>
               <span className="font-display text-xl font-bold text-foreground">रु {total}</span>

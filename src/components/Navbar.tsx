@@ -5,6 +5,7 @@ import { useStore } from "@/lib/store-context";
 import { Button } from "@/components/ui/button";
 import { LoginDialog } from "./LoginDialog";
 import { DiscordIcon } from "./DiscordIcon";
+import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/arctix-logo.png";
 
 export function Navbar() {
@@ -17,6 +18,7 @@ export function Navbar() {
     { to: "/", label: "Home" },
     { to: "/store", label: "Store" },
     { to: "/tickets", label: "Support" },
+    { to: "/profile", label: "Profile" },
     { to: "/cart", label: "Cart" },
   ] as const;
 
@@ -45,6 +47,7 @@ export function Navbar() {
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             <a
               href={settings.discordUrl}
               target="_blank"

@@ -64,11 +64,10 @@ function ProfilePage() {
   const totalSpent = invoices.filter((i) => i.status !== "cancelled").reduce((s, i) => s + Number(i.total), 0);
   const loyaltyPoints = Math.floor(totalSpent * settings.loyaltyPointsPerRupee);
 
-  function copyReferral() {
+  function copyReferralCode() {
     if (!profile?.referral_code) return;
-    const url = `${window.location.origin}/?ref=${profile.referral_code}`;
-    navigator.clipboard.writeText(url);
-    toast.success("Referral link copied!");
+    navigator.clipboard.writeText(profile.referral_code);
+    toast.success(`Code ${profile.referral_code} copied!`);
   }
 
   if (!activeUser) {
@@ -110,12 +109,16 @@ function ProfilePage() {
         <Card className="bg-card/70 border-border p-5">
           <div className="flex items-center gap-2 mb-3">
             <Share2 className="h-5 w-5 text-primary" />
-            <h2 className="font-display text-lg font-bold text-foreground">Refer Friends</h2>
+            <h2 className="font-display text-lg font-bold text-foreground">Your Referral Code</h2>
           </div>
-          <p className="text-xs text-muted-foreground mb-3">Earn {settings.referralRewardCoins} coins for every friend who signs up using your link.</p>
-          <div className="flex gap-2">
-            <Input readOnly value={`${typeof window !== "undefined" ? window.location.origin : ""}/?ref=${profile.referral_code}`} className="font-mono text-xs" />
-            <Button onClick={copyReferral} className="gradient-primary text-primary-foreground"><Copy className="h-4 w-4" /></Button>
+          <p className="text-xs text-muted-foreground mb-3">
+            Share this code with friends. When they enter it at checkout, you both earn {settings.referralRewardCoins} coins.
+          </p>
+          <div className="flex gap-2 items-center">
+            <div className="flex-1 px-4 py-3 rounded-md bg-muted/50 border border-border font-mono text-lg font-bold text-primary text-center tracking-widest">
+              {profile.referral_code}
+            </div>
+            <Button onClick={copyReferralCode} className="gradient-primary text-primary-foreground h-12"><Copy className="h-4 w-4 mr-1" /> Copy</Button>
           </div>
         </Card>
       )}
