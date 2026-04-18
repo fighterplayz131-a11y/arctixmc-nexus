@@ -10,7 +10,7 @@ import { DiscordIcon } from "@/components/DiscordIcon";
 import { IcyBackground } from "@/components/IcyBackground";
 import { DailyReward } from "@/components/DailyReward";
 import { FlashSaleStrip } from "@/components/FlashSaleStrip";
-import { Sparkles, Swords, Heart, Users, Zap, Shield, MessagesSquare, LifeBuoy, Activity, Trophy, Calendar, Clock, CheckCircle2, Award, Gift } from "lucide-react";
+import { Sparkles, Swords, Heart, Users, Zap, Shield, MessagesSquare, LifeBuoy, Activity, Trophy, Calendar, Clock, CheckCircle2, Award, Gift, Crown, Coins, Key } from "lucide-react";
 import heroImage from "@/assets/hero-mountains.jpg";
 
 const ICONS: Record<string, typeof Zap> = { Zap, Sparkles, Shield, Users, Award, Trophy, Activity, Heart, Swords, Gift };
@@ -149,27 +149,71 @@ function HomePage() {
         </section>
       )}
 
+      {/* Featured Ranks — moved up for prominence */}
+      {settings.sections.featured && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 pt-14 pb-6">
+          <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
+            <div>
+              <Badge className="mb-3 bg-primary/10 border border-primary/30 text-primary"><Crown className="h-3 w-3 mr-1" /> Premium Ranks</Badge>
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">{settings.featuredTitle}</h2>
+              <p className="text-muted-foreground mt-1 text-sm">{settings.featuredSubtitle}</p>
+            </div>
+            <Link to="/store" className="hidden md:inline-flex">
+              <Button variant="outline" className="bg-card/60 border-border">View All Ranks →</Button>
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {featured.map((r) => <RankCard key={r.id} rank={r} />)}
+          </div>
+        </section>
+      )}
+
       {/* Coins & Store Highlights */}
       {settings.highlightsEnabled && (highlightedCoins.length > 0 || highlightedKeys.length > 0) && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
-          <div className="text-center mb-8">
+          <div className="text-center mb-10">
             <Badge className="mb-3 bg-primary/10 border border-primary/30 text-primary"><Trophy className="h-3 w-3 mr-1" /> Most Popular</Badge>
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-2 text-foreground">{settings.highlightsTitle}</h2>
-            <p className="text-muted-foreground text-sm">{settings.highlightsSubtitle}</p>
+            <p className="text-muted-foreground text-sm max-w-xl mx-auto">{settings.highlightsSubtitle}</p>
           </div>
+
           {highlightedCoins.length > 0 && (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              {highlightedCoins.map((c) => <CoinCard key={c.id} pack={c} />)}
+            <div className="mb-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-9 w-9 rounded-lg bg-amber-400/15 border border-amber-400/30 flex items-center justify-center">
+                  <Coins className="h-4 w-4 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-bold text-foreground leading-tight">Coin Packages</h3>
+                  <p className="text-xs text-muted-foreground">In-game currency for ranks, kits and crates</p>
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {highlightedCoins.map((c) => <CoinCard key={c.id} pack={c} />)}
+              </div>
             </div>
           )}
+
           {highlightedKeys.length > 0 && (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {highlightedKeys.map((k) => <KeyCard key={k.id} item={k} />)}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-9 w-9 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center">
+                  <Key className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-bold text-foreground leading-tight">Crate Keys</h3>
+                  <p className="text-xs text-muted-foreground">Unlock exclusive loot, gear and rare cosmetics</p>
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {highlightedKeys.map((k) => <KeyCard key={k.id} item={k} />)}
+              </div>
             </div>
           )}
-          <div className="text-center mt-8">
+
+          <div className="text-center mt-10">
             <Link to="/store">
-              <Button variant="outline" className="bg-card/60 border-border">Browse full store →</Button>
+              <Button variant="outline" className="bg-card/60 border-border">Browse Full Store →</Button>
             </Link>
           </div>
         </section>
@@ -281,24 +325,6 @@ function HomePage() {
                 </Button>
               </a>
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* Featured Store */}
-      {settings.sections.featured && (
-        <section className="mx-auto max-w-7xl px-4 md:px-8 pb-12">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">{settings.featuredTitle}</h2>
-              <p className="text-muted-foreground mt-1 text-sm">{settings.featuredSubtitle}</p>
-            </div>
-            <Link to="/store" className="hidden md:inline-flex">
-              <Button variant="outline" className="bg-card/60 border-border">View All →</Button>
-            </Link>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {featured.map((r) => <RankCard key={r.id} rank={r} />)}
           </div>
         </section>
       )}

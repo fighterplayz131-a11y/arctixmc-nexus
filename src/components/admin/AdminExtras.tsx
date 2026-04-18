@@ -118,10 +118,18 @@ type Bundle = {
 };
 
 export function BundlesAdmin() {
+  const { ranks, coins, keys } = useStore();
   const [items, setItems] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState<Bundle>({ name: "", description: "", price: 0, original_price: 0, items: [], image_url: null, active: true });
-  const [itemDraft, setItemDraft] = useState({ name: "", type: "rank", quantity: 1 });
+  // Catalog selector: which existing item to add
+  const catalog = [
+    ...ranks.map((r) => ({ key: `rank:${r.id}`, label: `${r.name} Rank — रु ${r.discountPrice}`, name: r.name, type: "rank", price: r.discountPrice })),
+    ...coins.map((c) => ({ key: `coins:${c.id}`, label: `${c.coins.toLocaleString()} Coins — रु ${c.price}`, name: `${c.coins.toLocaleString()} Coins`, type: "coins", price: c.price })),
+    ...keys.map((k) => ({ key: `key:${k.id}`, label: `${k.name} — रु ${k.price}`, name: k.name, type: "key", price: k.price })),
+  ];
+  const [selectedKey, setSelectedKey] = useState<string>(catalog[0]?.key ?? "");
+  const [qty, setQty] = useState(1);
 
   async function load() {
     setLoading(true);
@@ -131,10 +139,25 @@ export function BundlesAdmin() {
   }
   useEffect(() => { load(); }, []);
 
+  // Auto-calc original_price from items so admin sees suggested savings
+  const suggestedOriginal = draft.items.reduce((sum, it) => {
+    const cat = catalog.find((c) => c.name === it.name && c.type === it.type);
+    return sum + (cat?.price ?? 0) * (it.quantity ?? 1);
+  }, 0);
+
+  function addItemToDraft() {
+    const cat = catalog.find((c) => c.key === selectedKey);
+    if (!cat) return toast.error("Select an item first");
+    setDraft({ ...draft, items: [...draft.items, { name: cat.name, type: cat.type, quantity: qty }] });
+    setQty(1);
+  }
+
   async function add() {
     if (!draft.name.trim()) return toast.error("Name required");
+    if (draft.items.length === 0) return toast.error("Add at least one item to the bundle");
     const { error } = await supabase.from("bundles").insert({
-      name: draft.name, description: draft.description, price: draft.price, original_price: draft.original_price,
+      name: draft.name, description: draft.description, price: draft.price,
+      original_price: draft.original_price || suggestedOriginal,
       items: draft.items, image_url: draft.image_url, active: draft.active,
     });
     if (error) return toast.error(error.message);
@@ -159,27 +182,44 @@ export function BundlesAdmin() {
         <h2 className="font-display text-lg font-bold">Create Bundle</h2>
         <div className="grid md:grid-cols-2 gap-3">
           <div><Label>Name</Label><Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Starter Pack" /></div>
-          <div><Label>Image URL</Label><Input value={draft.image_url ?? ""} onChange={(e) => setDraft({ ...draft, image_url: e.target.value || null })} /></div>
-          <div><Label>Price (Rs)</Label><Input type="number" value={draft.price} onChange={(e) => setDraft({ ...draft, price: +e.target.value })} /></div>
-          <div><Label>Original Price (Rs)</Label><Input type="number" value={draft.original_price} onChange={(e) => setDraft({ ...draft, original_price: +e.target.value })} /></div>
-          <div className="md:col-span-2"><Label>Description</Label><Textarea rows={2} value={draft.description ?? ""} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></div>
+          <div><Label>Image URL (optional)</Label><Input value={draft.image_url ?? ""} onChange={(e) => setDraft({ ...draft, image_url: e.target.value || null })} /></div>
+          <div><Label>Bundle Price (Rs)</Label><Input type="number" value={draft.price} onChange={(e) => setDraft({ ...draft, price: +e.target.value })} /></div>
+          <div>
+            <Label>Original Price (Rs) — leave 0 for auto</Label>
+            <Input type="number" value={draft.original_price} onChange={(e) => setDraft({ ...draft, original_price: +e.target.value })} placeholder={`Auto: ${suggestedOriginal}`} />
+          </div>
+          <div className="md:col-span-2"><Label>Description</Label><Textarea rows={2} value={draft.description ?? ""} onChange={(e) => setDraft({ ...draft, description: e.target.value })} placeholder="What players get in this bundle…" /></div>
         </div>
+
         <div className="space-y-2">
-          <Label>Bundle Items</Label>
+          <Label>Add items from your store</Label>
           <div className="flex flex-wrap gap-2">
-            <Input className="flex-1 min-w-[140px]" placeholder="Item name" value={itemDraft.name} onChange={(e) => setItemDraft({ ...itemDraft, name: e.target.value })} />
-            <select className="h-9 rounded-md border border-input bg-transparent px-3 text-sm" value={itemDraft.type} onChange={(e) => setItemDraft({ ...itemDraft, type: e.target.value })}>
-              <option value="rank">Rank</option><option value="coins">Coins</option><option value="key">Key</option>
+            <select className="flex-1 min-w-[200px] h-9 rounded-md border border-input bg-transparent px-3 text-sm" value={selectedKey} onChange={(e) => setSelectedKey(e.target.value)}>
+              {catalog.length === 0 ? <option value="">No store items yet</option> : catalog.map((c) => (
+                <option key={c.key} value={c.key}>{c.label}</option>
+              ))}
             </select>
-            <Input type="number" className="w-20" value={itemDraft.quantity} onChange={(e) => setItemDraft({ ...itemDraft, quantity: +e.target.value })} />
-            <Button size="sm" variant="outline" onClick={() => { if (itemDraft.name) { setDraft({ ...draft, items: [...draft.items, itemDraft] }); setItemDraft({ name: "", type: "rank", quantity: 1 }); } }}>Add</Button>
+            <Input type="number" min={1} className="w-20" value={qty} onChange={(e) => setQty(Math.max(1, +e.target.value))} />
+            <Button size="sm" variant="outline" onClick={addItemToDraft}><Plus className="h-4 w-4 mr-1" /> Add Item</Button>
           </div>
-          <div className="flex flex-wrap gap-1">
-            {draft.items.map((it, i) => (
-              <span key={i} className="text-xs bg-muted rounded px-2 py-1 flex items-center gap-1">{it.quantity}× {it.name} ({it.type}) <button onClick={() => setDraft({ ...draft, items: draft.items.filter((_, j) => j !== i) })}>×</button></span>
-            ))}
-          </div>
+          {draft.items.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {draft.items.map((it, i) => (
+                <span key={i} className="text-xs bg-muted rounded px-2 py-1 flex items-center gap-1.5">
+                  {it.quantity && it.quantity > 1 ? `${it.quantity}× ` : ""}{it.name}
+                  <span className="text-muted-foreground">({it.type})</span>
+                  <button className="text-destructive hover:text-destructive/80" onClick={() => setDraft({ ...draft, items: draft.items.filter((_, j) => j !== i) })}>×</button>
+                </span>
+              ))}
+            </div>
+          )}
+          {suggestedOriginal > 0 && draft.price > 0 && draft.price < suggestedOriginal && (
+            <p className="text-xs text-emerald-400">
+              Players save रु {suggestedOriginal - draft.price} ({Math.round(((suggestedOriginal - draft.price) / suggestedOriginal) * 100)}% off)
+            </p>
+          )}
         </div>
+
         <Button onClick={add} className="gradient-primary text-primary-foreground"><Plus className="h-4 w-4 mr-1" /> Add Bundle</Button>
       </Card>
 
@@ -191,7 +231,7 @@ export function BundlesAdmin() {
               <div key={b.id} className="rounded-md border border-border bg-muted/20 p-3 flex flex-wrap items-center gap-3">
                 <div className="font-display font-bold">{b.name}</div>
                 <div className="text-sm">Rs {b.price} <span className="line-through text-muted-foreground">Rs {b.original_price}</span></div>
-                <div className="text-xs text-muted-foreground">{b.items.length} items</div>
+                <div className="text-xs text-muted-foreground">{b.items.length} items: {b.items.map((i) => `${i.quantity ?? 1}× ${i.name}`).join(", ")}</div>
                 <label className="flex items-center gap-1 text-xs ml-auto"><input type="checkbox" checked={b.active} onChange={(e) => update(b.id!, { active: e.target.checked })} /> Active</label>
                 <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(b.id!)}><Trash2 className="h-4 w-4" /></Button>
               </div>
