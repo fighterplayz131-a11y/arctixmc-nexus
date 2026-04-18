@@ -126,6 +126,11 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <TabsTrigger value="ranks">Ranks</TabsTrigger>
             <TabsTrigger value="coins">Coins</TabsTrigger>
             <TabsTrigger value="keys">Crate Keys</TabsTrigger>
+            <TabsTrigger value="bundles">Bundles</TabsTrigger>
+            <TabsTrigger value="coupons">Coupons</TabsTrigger>
+            <TabsTrigger value="flash">Flash Sales</TabsTrigger>
+            <TabsTrigger value="announce">Announcements</TabsTrigger>
+            <TabsTrigger value="rewards">Rewards & Support</TabsTrigger>
             <TabsTrigger value="tickets">Tickets</TabsTrigger>
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -134,6 +139,11 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           <TabsContent value="ranks" className="mt-5"><RanksAdmin /></TabsContent>
           <TabsContent value="coins" className="mt-5"><CoinsAdmin /></TabsContent>
           <TabsContent value="keys" className="mt-5"><KeysAdmin /></TabsContent>
+          <TabsContent value="bundles" className="mt-5"><BundlesAdmin /></TabsContent>
+          <TabsContent value="coupons" className="mt-5"><CouponsAdmin /></TabsContent>
+          <TabsContent value="flash" className="mt-5"><FlashSalesAdmin /></TabsContent>
+          <TabsContent value="announce" className="mt-5"><AnnouncementsAdmin /></TabsContent>
+          <TabsContent value="rewards" className="mt-5"><RewardsSettingsAdmin /></TabsContent>
           <TabsContent value="tickets" className="mt-5"><TicketsAdmin /></TabsContent>
           <TabsContent value="invoices" className="mt-5"><InvoicesAdmin /></TabsContent>
           <TabsContent value="settings" className="mt-5"><SettingsAdmin /></TabsContent>
