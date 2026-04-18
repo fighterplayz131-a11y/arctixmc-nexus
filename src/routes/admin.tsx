@@ -718,6 +718,102 @@ function HomepageAdmin() {
           ))}
         </Card>
 
+        <Card className="bg-card/70 border-border p-5 space-y-4">
+          <h2 className="font-display text-lg font-bold">Live Players & Server Status</h2>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={!!draft.livePlayersEnabled} onChange={(e) => upd({ livePlayersEnabled: e.target.checked })} /> Show live players strip
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Live Player Count</Label><Input type="number" value={draft.livePlayersCount ?? 0} onChange={(e) => upd({ livePlayersCount: +e.target.value })} /></div>
+            <div><Label>Players Label</Label><Input value={draft.livePlayersLabel ?? ""} onChange={(e) => upd({ livePlayersLabel: e.target.value })} /></div>
+            <div><Label>Server Status</Label>
+              <select value={draft.serverStatus ?? "online"} onChange={(e) => upd({ serverStatus: e.target.value as Settings["serverStatus"] })} className="w-full h-9 rounded-md bg-input px-3 text-sm border border-border">
+                <option value="online">Online</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="offline">Offline</option>
+              </select>
+            </div>
+            <div><Label>Status Text</Label><Input value={draft.serverStatusText ?? ""} onChange={(e) => upd({ serverStatusText: e.target.value })} /></div>
+          </div>
+        </Card>
+
+        <Card className="bg-card/70 border-border p-5 space-y-4">
+          <h2 className="font-display text-lg font-bold">Coins & Store Highlights</h2>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={!!draft.highlightsEnabled} onChange={(e) => upd({ highlightsEnabled: e.target.checked })} /> Show highlights section
+          </label>
+          <div><Label>Section Title</Label><Input value={draft.highlightsTitle ?? ""} onChange={(e) => upd({ highlightsTitle: e.target.value })} /></div>
+          <div><Label>Subtitle</Label><Input value={draft.highlightsSubtitle ?? ""} onChange={(e) => upd({ highlightsSubtitle: e.target.value })} /></div>
+          <HighlightPicker
+            label="Featured Coin Packages"
+            options={useStore.getState ? [] : []}
+            type="coins"
+            selected={draft.highlightCoinIds ?? []}
+            onChange={(ids) => upd({ highlightCoinIds: ids })}
+          />
+          <HighlightPicker
+            label="Featured Crate Keys"
+            type="keys"
+            selected={draft.highlightKeyIds ?? []}
+            onChange={(ids) => upd({ highlightKeyIds: ids })}
+          />
+        </Card>
+
+        <Card className="bg-card/70 border-border p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold">Why Choose Section</h2>
+            <Button size="sm" variant="outline" onClick={() => upd({ whyChooseFeatures: [...(draft.whyChooseFeatures ?? []), { icon: "Zap", title: "New feature", text: "Describe it" }] })}>
+              <Plus className="h-3 w-3 mr-1" /> Add
+            </Button>
+          </div>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={!!draft.whyChooseEnabled} onChange={(e) => upd({ whyChooseEnabled: e.target.checked })} /> Show section
+          </label>
+          <div><Label>Title</Label><Input value={draft.whyChooseTitle ?? ""} onChange={(e) => upd({ whyChooseTitle: e.target.value })} /></div>
+          <div><Label>Subtitle</Label><Textarea rows={2} value={draft.whyChooseSubtitle ?? ""} onChange={(e) => upd({ whyChooseSubtitle: e.target.value })} /></div>
+          {(draft.whyChooseFeatures ?? []).map((f, i) => (
+            <div key={i} className="rounded-md border border-border bg-muted/20 p-3 space-y-2">
+              <div className="grid grid-cols-[1fr_2fr_auto] gap-2">
+                <select value={f.icon} onChange={(e) => { const n = [...draft.whyChooseFeatures]; n[i] = { ...n[i], icon: e.target.value }; upd({ whyChooseFeatures: n }); }} className="h-9 rounded-md bg-input px-3 text-sm border border-border">
+                  {["Zap","Sparkles","Shield","Users","Award","Trophy","Activity","Heart","Swords","Gift"].map((ic) => <option key={ic} value={ic}>{ic}</option>)}
+                </select>
+                <Input placeholder="Title" value={f.title} onChange={(e) => { const n = [...draft.whyChooseFeatures]; n[i] = { ...n[i], title: e.target.value }; upd({ whyChooseFeatures: n }); }} />
+                <Button size="icon" variant="ghost" className="text-destructive" onClick={() => upd({ whyChooseFeatures: draft.whyChooseFeatures.filter((_, j) => j !== i) })}><Trash2 className="h-4 w-4" /></Button>
+              </div>
+              <Textarea rows={2} placeholder="Description" value={f.text} onChange={(e) => { const n = [...draft.whyChooseFeatures]; n[i] = { ...n[i], text: e.target.value }; upd({ whyChooseFeatures: n }); }} />
+            </div>
+          ))}
+        </Card>
+
+        <Card className="bg-card/70 border-border p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold">Server Events</h2>
+            <Button size="sm" variant="outline" onClick={() => upd({ events: [...(draft.events ?? []), { title: "New event", description: "Details", date: "TBD", status: "upcoming" }] })}>
+              <Plus className="h-3 w-3 mr-1" /> Add Event
+            </Button>
+          </div>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={!!draft.eventsEnabled} onChange={(e) => upd({ eventsEnabled: e.target.checked })} /> Show events section
+          </label>
+          <div><Label>Title</Label><Input value={draft.eventsTitle ?? ""} onChange={(e) => upd({ eventsTitle: e.target.value })} /></div>
+          <div><Label>Subtitle</Label><Input value={draft.eventsSubtitle ?? ""} onChange={(e) => upd({ eventsSubtitle: e.target.value })} /></div>
+          {(draft.events ?? []).map((ev, i) => (
+            <div key={i} className="rounded-md border border-border bg-muted/20 p-3 space-y-2">
+              <div className="grid grid-cols-[1fr_auto_auto] gap-2">
+                <Input placeholder="Title" value={ev.title} onChange={(e) => { const n = [...draft.events]; n[i] = { ...n[i], title: e.target.value }; upd({ events: n }); }} />
+                <select value={ev.status} onChange={(e) => { const n = [...draft.events]; n[i] = { ...n[i], status: e.target.value as "live" | "upcoming" | "ended" }; upd({ events: n }); }} className="h-9 rounded-md bg-input px-3 text-sm border border-border">
+                  <option value="live">Live</option>
+                  <option value="upcoming">Upcoming</option>
+                  <option value="ended">Ended</option>
+                </select>
+                <Button size="icon" variant="ghost" className="text-destructive" onClick={() => upd({ events: draft.events.filter((_, j) => j !== i) })}><Trash2 className="h-4 w-4" /></Button>
+              </div>
+              <Input placeholder="Date / when" value={ev.date} onChange={(e) => { const n = [...draft.events]; n[i] = { ...n[i], date: e.target.value }; upd({ events: n }); }} />
+              <Textarea rows={2} placeholder="Description" value={ev.description} onChange={(e) => { const n = [...draft.events]; n[i] = { ...n[i], description: e.target.value }; upd({ events: n }); }} />
+            </div>
+          ))}
+        </Card>
+
         <div className="sticky bottom-4 bg-background/80 backdrop-blur-sm p-3 rounded-lg border border-border">
           <Button onClick={save} className="gradient-primary text-primary-foreground w-full">
             <Save className="h-4 w-4 mr-1.5" /> Save Homepage
