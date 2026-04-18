@@ -149,6 +149,86 @@ function HomePage() {
         </section>
       )}
 
+      {/* Coins & Store Highlights */}
+      {settings.highlightsEnabled && (highlightedCoins.length > 0 || highlightedKeys.length > 0) && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
+          <div className="text-center mb-8">
+            <Badge className="mb-3 bg-primary/10 border border-primary/30 text-primary"><Trophy className="h-3 w-3 mr-1" /> Most Popular</Badge>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2 text-foreground">{settings.highlightsTitle}</h2>
+            <p className="text-muted-foreground text-sm">{settings.highlightsSubtitle}</p>
+          </div>
+          {highlightedCoins.length > 0 && (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {highlightedCoins.map((c) => <CoinCard key={c.id} pack={c} />)}
+            </div>
+          )}
+          {highlightedKeys.length > 0 && (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {highlightedKeys.map((k) => <KeyCard key={k.id} crateKey={k} />)}
+            </div>
+          )}
+          <div className="text-center mt-8">
+            <Link to="/store">
+              <Button variant="outline" className="bg-card/60 border-border">Browse full store →</Button>
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* Why Choose ArctixMC */}
+      {settings.whyChooseEnabled && settings.whyChooseFeatures?.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2 text-foreground">{settings.whyChooseTitle}</h2>
+            <p className="text-muted-foreground text-sm max-w-xl mx-auto">{settings.whyChooseSubtitle}</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {settings.whyChooseFeatures.map((f, i) => {
+              const Icon = ICONS[f.icon] ?? CheckCircle2;
+              return (
+                <div key={i} className="rounded-xl bg-card/80 border border-border p-5 hover:border-primary/40 transition-colors">
+                  <div className="h-11 w-11 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center mb-3">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="font-display font-bold text-foreground mb-1.5">{f.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{f.text}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Event Highlights */}
+      {settings.eventsEnabled && settings.events?.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
+          <div className="text-center mb-8">
+            <Badge className="mb-3 bg-primary/10 border border-primary/30 text-primary"><Calendar className="h-3 w-3 mr-1" /> Events</Badge>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-2 text-foreground">{settings.eventsTitle}</h2>
+            <p className="text-muted-foreground text-sm">{settings.eventsSubtitle}</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {settings.events.map((ev, i) => {
+              const tone =
+                ev.status === "live" ? { badge: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", label: "Live now" }
+                : ev.status === "upcoming" ? { badge: "bg-amber-500/15 text-amber-300 border-amber-500/30", label: "Upcoming" }
+                : { badge: "bg-muted text-muted-foreground border-border", label: "Ended" };
+              return (
+                <div key={i} className="rounded-xl bg-card/80 border border-border p-5 hover:border-primary/40 transition-colors">
+                  <div className="flex items-center justify-between mb-3">
+                    <Badge variant="outline" className={`border ${tone.badge}`}>{tone.label}</Badge>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> {ev.date}</div>
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-foreground mb-1">{ev.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{ev.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+
       {/* Modes */}
       {settings.sections.modes && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 py-16">
