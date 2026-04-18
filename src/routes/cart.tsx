@@ -66,13 +66,35 @@ function CartPage() {
       return;
     }
     // Also create invoice record
-    await supabase.from("invoices").insert({
+    const { data: invoice } = await supabase.from("invoices").insert({
       username,
       items: cart.map((i) => ({ id: i.id, name: i.name, type: i.type, price: i.price, quantity: i.quantity })),
       total,
       status: "pending",
       ticket_id: ticket.id,
-    });
+    }).select("id").single();
+
+    // Record coupon redemption + bump used_count
+    if (coupon && invoice) {
+      await supabase.from("coupon_redemptions").insert({ coupon_id: coupon.id, username, invoice_id: invoice.id });
+      await supabase.from("coupons").update({ used_count: coupon.used_count + 1 }).eq("id", coupon.id);
+    }
+
+    // Record referral if user typed a code
+    const refCode = referralCode.trim();
+    if (refCode) {
+      const { data: refProfile } = await supabase.from("profiles").select("username").eq("referral_code", refCode.toUpperCase()).maybeSingle();
+      if (refProfile && refProfile.username !== username) {
+        await supabase.from("referrals").insert({
+          referrer_username: refProfile.username,
+          referred_username: username,
+          reward_granted: false,
+        });
+        toast.success(`Referral by ${refProfile.username} recorded!`);
+      } else if (!refProfile) {
+        toast.error("Referral code not found (order still placed)");
+      }
+    }
     setSubmitting(false);
     toast.success(`Order placed! Ticket #${ticket.ticket_no} created.`);
     clearCart();
