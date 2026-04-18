@@ -45,6 +45,7 @@ export function Navbar() {
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             <a
               href={settings.discordUrl}
               target="_blank"
