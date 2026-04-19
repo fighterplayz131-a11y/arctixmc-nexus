@@ -1,4 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useStore } from "@/lib/store-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,12 +11,7 @@ import { LoginDialog } from "@/components/LoginDialog";
 import { toast } from "sonner";
 import { validateCoupon, applyCoupon, type Coupon } from "@/lib/coupons";
 
-export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Cart — ArctixMC" }] }),
-  component: CartPage,
-});
-
-function CartPage() {
+export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, username, clearCart } = useStore();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -65,7 +61,6 @@ function CartPage() {
       toast.error("Could not create order ticket. Please try again.");
       return;
     }
-    // Also create invoice record
     const { data: invoice } = await supabase.from("invoices").insert({
       username,
       items: cart.map((i) => ({ id: i.id, name: i.name, type: i.type, price: i.price, quantity: i.quantity })),
@@ -74,13 +69,11 @@ function CartPage() {
       ticket_id: ticket.id,
     }).select("id").single();
 
-    // Record coupon redemption + bump used_count
     if (coupon && invoice) {
       await supabase.from("coupon_redemptions").insert({ coupon_id: coupon.id, username, invoice_id: invoice.id });
       await supabase.from("coupons").update({ used_count: coupon.used_count + 1 }).eq("id", coupon.id);
     }
 
-    // Record referral if user typed a code
     const refCode = referralCode.trim();
     if (refCode) {
       const { data: refProfile } = await supabase.from("profiles").select("username").eq("referral_code", refCode.toUpperCase()).maybeSingle();
@@ -99,11 +92,12 @@ function CartPage() {
     toast.success(`Order placed! Ticket #${ticket.ticket_no} created.`);
     clearCart();
     setCheckoutOpen(false);
-    navigate({ to: "/tickets" });
+    navigate("/tickets");
   }
 
   return (
     <div className="mx-auto max-w-5xl px-4 md:px-8 py-12 animate-fade-in">
+      <Helmet><title>Cart — ArctixMC</title></Helmet>
       <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-6">Your Cart</h1>
 
       {cart.length === 0 ? (
@@ -151,7 +145,6 @@ function CartPage() {
               )}
             </div>
 
-            {/* Coupon */}
             <div className="mb-3">
               <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1"><Tag className="h-3 w-3" /> Coupon code</label>
               {coupon ? (
@@ -167,7 +160,6 @@ function CartPage() {
               )}
             </div>
 
-            {/* Referral */}
             <div className="mb-4">
               <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1"><Users className="h-3 w-3" /> Referral code (optional)</label>
               <Input value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder="FRIEND-AB12" className="h-9 uppercase font-mono text-sm" />

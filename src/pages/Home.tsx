@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import { useStore } from "@/lib/store-context";
 import { CopyIp } from "@/components/CopyIp";
 import { Button } from "@/components/ui/button";
@@ -15,22 +16,7 @@ import heroImage from "@/assets/hero-mountains.jpg";
 
 const ICONS: Record<string, typeof Zap> = { Zap, Sparkles, Shield, Users, Award, Trophy, Activity, Heart, Swords, Gift };
 
-
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "ArctixMC — Premium Minecraft Network" },
-      { name: "description", content: "Join ArctixMC: Survival, Lifesteal and PvP. Premium ranks, coins and crate keys. IP: play.arctixmc.net" },
-      { property: "og:title", content: "ArctixMC — Premium Minecraft Network" },
-      { property: "og:description", content: "Premium Minecraft network. Season 1 Survival live now." },
-      { property: "og:image", content: heroImage },
-      { name: "twitter:image", content: heroImage },
-    ],
-  }),
-  component: HomePage,
-});
-
-function HomePage() {
+export default function HomePage() {
   const { settings, ranks, coins, keys } = useStore();
   const featured = ranks.slice(0, 3);
   const bg = settings.heroBackgroundUrl || heroImage;
@@ -48,15 +34,22 @@ function HomePage() {
 
   return (
     <div className="animate-fade-in">
+      <Helmet>
+        <title>ArctixMC — Premium Minecraft Network</title>
+        <meta name="description" content="Join ArctixMC: Survival, Lifesteal and PvP. Premium ranks, coins and crate keys. IP: play.arctixmc.net" />
+        <meta property="og:title" content="ArctixMC — Premium Minecraft Network" />
+        <meta property="og:description" content="Premium Minecraft network. Season 1 Survival live now." />
+        <meta property="og:image" content={heroImage} />
+        <meta name="twitter:image" content={heroImage} />
+      </Helmet>
+
       {/* Hero — Minecraft icy biome */}
       <section className="relative overflow-hidden">
-        {/* Layered cinematic image */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-70"
           style={{ backgroundImage: `url(${bg})` }}
           aria-hidden="true"
         />
-        {/* Animated parallax mountains + snow over the image */}
         <IcyBackground />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -93,7 +86,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Live Player Count + Server Status */}
       {settings.livePlayersEnabled && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6">
           <div className="rounded-xl bg-card/80 border border-border p-4 md:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
@@ -123,13 +115,11 @@ function HomePage() {
         </section>
       )}
 
-      {/* Flash sales + Daily reward strip */}
       <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6 space-y-3">
         <FlashSaleStrip />
         <DailyReward />
       </section>
 
-      {/* Stats */}
       {settings.sections.stats && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 mt-6 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -149,7 +139,6 @@ function HomePage() {
         </section>
       )}
 
-      {/* Featured Ranks — moved up for prominence */}
       {settings.sections.featured && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 pt-14 pb-6">
           <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
@@ -168,7 +157,6 @@ function HomePage() {
         </section>
       )}
 
-      {/* Coins & Store Highlights */}
       {settings.highlightsEnabled && (highlightedCoins.length > 0 || highlightedKeys.length > 0) && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
           <div className="text-center mb-10">
@@ -219,7 +207,6 @@ function HomePage() {
         </section>
       )}
 
-      {/* Why Choose ArctixMC */}
       {settings.whyChooseEnabled && settings.whyChooseFeatures?.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
           <div className="text-center mb-10">
@@ -243,7 +230,6 @@ function HomePage() {
         </section>
       )}
 
-      {/* Event Highlights */}
       {settings.eventsEnabled && settings.events?.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 py-14">
           <div className="text-center mb-8">
@@ -272,8 +258,6 @@ function HomePage() {
         </section>
       )}
 
-
-      {/* Modes */}
       {settings.sections.modes && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 py-16">
           <div className="text-center mb-10">
@@ -309,7 +293,6 @@ function HomePage() {
         </section>
       )}
 
-      {/* Discord CTA */}
       {settings.sections.discord && (
         <section className="mx-auto max-w-7xl px-4 md:px-8 pb-16">
           <div className="relative overflow-hidden rounded-2xl border border-[#5865F2]/30 bg-gradient-to-br from-[#5865F2]/15 via-card/70 to-card/70 p-8 md:p-10">
@@ -329,7 +312,6 @@ function HomePage() {
         </section>
       )}
 
-      {/* Ticket banner */}
       <section className="mx-auto max-w-7xl px-4 md:px-8 pb-16">
         <div className="rounded-2xl bg-card/70 border border-border p-6 md:p-8 grid md:grid-cols-[1fr_auto] gap-5 items-center">
           <div className="flex items-start gap-4">

@@ -1,5 +1,5 @@
 import { useStore } from "@/lib/store-context";
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { DiscordIcon } from "./DiscordIcon";
 import logo from "@/assets/arctix-logo.png";
 
@@ -30,12 +30,7 @@ export function Footer() {
         </div>
         <div>
           <h4 className="text-sm font-semibold mb-3 text-foreground">Community</h4>
-          <a
-            href={settings.discordUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#5865F2] text-white hover:bg-[#4752C4] transition-colors text-sm font-medium"
-          >
+          <a href={settings.discordUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#5865F2] text-white hover:bg-[#4752C4] transition-colors text-sm font-medium">
             <DiscordIcon className="h-4 w-4" /> Join our Discord
           </a>
         </div>

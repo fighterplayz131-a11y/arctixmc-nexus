@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,21 +11,16 @@ import { Badge } from "@/components/ui/badge";
 import {
   LifeBuoy, CheckCircle2, Search, Send, MessageCircle, ChevronLeft,
   Bug, CreditCard, Receipt, AlertTriangle, Clock, Paperclip, X as XIcon,
-  Activity, ShieldCheck, MessagesSquare,
+  ShieldCheck, MessagesSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { GemBurstButton } from "@/components/GemBurstButton";
 import { SupportFAQ, TicketStatusTracker } from "@/components/SupportFAQ";
 
-export const Route = createFileRoute("/tickets")({
-  head: () => ({ meta: [{ title: "Support — ArctixMC" }] }),
-  component: TicketsPage,
-});
-
 const CATEGORIES = ["Purchase Issue", "Rank Issue", "Coins Issue", "Crate Key Issue", "Bug Report", "Server Issue", "Staff Help", "Other"];
 const PRIORITIES = ["low", "normal", "high", "urgent"];
 const MAX_FILES = 5;
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
 const schema = z.object({
   username: z.string().trim().min(3).max(16).regex(/^[A-Za-z0-9_]+$/),
@@ -41,17 +36,20 @@ type Ticket = {
   subject: string; status: string; priority: string; created_at: string;
   description?: string; contact?: string | null; admin_notes?: string | null;
 };
+type Reply = { id: string; ticket_id: string; author_type: "user" | "admin"; author_name: string; message: string; created_at: string };
+type Attachment = { id: string; file_url: string; file_name: string; file_size: number; mime_type: string | null };
 
-type Reply = {
-  id: string; ticket_id: string; author_type: "user" | "admin";
-  author_name: string; message: string; created_at: string;
-};
+export function StatusBadge({ status }: { status: string }) {
+  const map: Record<string, string> = {
+    open: "bg-blue-500/15 text-blue-300 border-blue-500/30",
+    in_progress: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+    closed: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  };
+  const cls = map[status] ?? "bg-muted text-muted-foreground border-border";
+  return <Badge variant="outline" className={cls + " text-[10px]"}>{status.replace("_", " ")}</Badge>;
+}
 
-type Attachment = {
-  id: string; file_url: string; file_name: string; file_size: number; mime_type: string | null;
-};
-
-function TicketsPage() {
+export default function TicketsPage() {
   const { username, settings } = useStore();
   const [submitted, setSubmitted] = useState<{ no: number; id: string } | null>(null);
   const [form, setForm] = useState({
@@ -143,6 +141,7 @@ function TicketsPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 md:px-8 py-12 animate-fade-in space-y-6">
+      <Helmet><title>Support — ArctixMC</title></Helmet>
       <div className="text-center mb-2">
         <div className="mx-auto h-12 w-12 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center mb-3">
           <LifeBuoy className="h-6 w-6 text-primary" />
@@ -156,7 +155,6 @@ function TicketsPage() {
         </div>
       </div>
 
-      {/* Quick actions */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <QuickCard icon={<MessagesSquare className="h-5 w-5" />} title="Discord Support" subtitle="Fast staff replies" href={settings.discordUrl} />
         <QuickCard icon={<CreditCard className="h-5 w-5" />} title="Payment Help" subtitle="Failed payment? Tap to scroll" anchor="#payment-help" />
@@ -166,7 +164,6 @@ function TicketsPage() {
 
       <SupportFAQ />
 
-      {/* Payment Help */}
       <div id="payment-help" className="rounded-xl bg-card/60 border border-border p-6">
         <div className="flex items-center gap-2 mb-3">
           <CreditCard className="h-5 w-5 text-primary" />
@@ -186,10 +183,8 @@ function TicketsPage() {
         </div>
       </div>
 
-      {/* Order Lookup */}
       <OrderLookup />
 
-      {/* Support Rules */}
       <div className="rounded-xl bg-amber-500/5 border border-amber-500/30 p-6">
         <div className="flex items-center gap-2 mb-3">
           <AlertTriangle className="h-5 w-5 text-amber-300" />
@@ -202,7 +197,6 @@ function TicketsPage() {
         </ul>
       </div>
 
-      {/* Form + my tickets */}
       <div id="new-ticket" className="grid lg:grid-cols-[1.4fr_1fr] gap-6">
         <div className="rounded-xl bg-card/60 border border-border p-6">
           {submitted ? (
@@ -247,7 +241,7 @@ function TicketsPage() {
               </div>
               <div>
                 <Label className="text-xs">Description</Label>
-                <Textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Describe the issue in detail. Include time, steps to reproduce, etc." />
+                <Textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Describe the issue in detail." />
               </div>
               <div>
                 <Label className="text-xs">Attachments (max {MAX_FILES} · 20MB each)</Label>
@@ -479,14 +473,4 @@ function TicketThread({ ticket, onBack, authorName }: { ticket: Ticket; onBack: 
       </div>
     </div>
   );
-}
-
-export function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, string> = {
-    open: "bg-blue-500/15 text-blue-300 border-blue-500/30",
-    in_progress: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-    closed: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  };
-  const cls = map[status] ?? "bg-muted text-muted-foreground border-border";
-  return <Badge variant="outline" className={cls + " text-[10px]"}>{status.replace("_", " ")}</Badge>;
 }

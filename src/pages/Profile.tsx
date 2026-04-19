@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useStore } from "@/lib/store-context";
@@ -10,11 +11,6 @@ import { User, Coins, Trophy, Receipt, Heart, Share2, Copy } from "lucide-react"
 import { toast } from "sonner";
 import { useWishlist } from "@/lib/wishlist-context";
 
-export const Route = createFileRoute("/profile")({
-  head: () => ({ meta: [{ title: "Profile — ArctixMC" }] }),
-  component: ProfilePage,
-});
-
 type Profile = {
   username: string;
   display_name: string | null;
@@ -25,7 +21,7 @@ type Profile = {
 
 type Invoice = { id: string; invoice_no: number; total: number; status: string; created_at: string };
 
-function ProfilePage() {
+export default function ProfilePage() {
   const { username, settings } = useStore();
   const wishlist = useWishlist();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -39,7 +35,6 @@ function ProfilePage() {
     if (!activeUser) { setLoading(false); return; }
     (async () => {
       setLoading(true);
-      // Ensure profile row exists
       let { data } = await supabase.from("profiles").select("*").eq("username", activeUser).maybeSingle();
       if (!data && username && username === activeUser) {
         const refCode = activeUser.toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
@@ -50,7 +45,6 @@ function ProfilePage() {
       }
       setProfile(data as Profile | null);
 
-      // Aggregate spent + loyalty from invoices
       const { data: invs } = await supabase
         .from("invoices")
         .select("id,invoice_no,total,status,created_at")
@@ -73,6 +67,7 @@ function ProfilePage() {
   if (!activeUser) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center animate-fade-in">
+        <Helmet><title>Profile — ArctixMC</title></Helmet>
         <User className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
         <h1 className="font-display text-2xl font-bold mb-2">Player Profile</h1>
         <p className="text-sm text-muted-foreground mb-4">Login or look up a player by username.</p>
@@ -88,6 +83,7 @@ function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 md:px-8 py-12 animate-fade-in space-y-6">
+      <Helmet><title>Profile — ArctixMC</title></Helmet>
       <div className="flex items-center gap-4">
         <div className="h-16 w-16 rounded-xl gradient-primary flex items-center justify-center font-display text-2xl font-bold text-primary-foreground">
           {activeUser[0]?.toUpperCase()}

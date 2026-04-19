@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,19 +9,7 @@ import { KeyCard } from "@/components/KeyCard";
 import { BundleCard, type Bundle } from "@/components/BundleCard";
 import { Crown, Coins, Key, Package } from "lucide-react";
 
-export const Route = createFileRoute("/store")({
-  head: () => ({
-    meta: [
-      { title: "Store — ArctixMC" },
-      { name: "description", content: "Browse ArctixMC ranks, coin packages, crate keys and bundles." },
-      { property: "og:title", content: "ArctixMC Store" },
-      { property: "og:description", content: "Premium ranks, coins, keys and bundles for ArctixMC." },
-    ],
-  }),
-  component: StorePage,
-});
-
-function StorePage() {
+export default function StorePage() {
   const { ranks, coins, keys } = useStore();
   const visibleCoins = coins.filter((c) => c.visible !== false);
   const activeKeys = keys.filter((k) => k.active !== false);
@@ -35,6 +23,13 @@ function StorePage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 md:px-8 py-12 animate-fade-in">
+      <Helmet>
+        <title>Store — ArctixMC</title>
+        <meta name="description" content="Browse ArctixMC ranks, coin packages, crate keys and bundles." />
+        <meta property="og:title" content="ArctixMC Store" />
+        <meta property="og:description" content="Premium ranks, coins, keys and bundles for ArctixMC." />
+      </Helmet>
+
       <div className="text-center mb-8">
         <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-2">Store</h1>
         <p className="text-muted-foreground text-sm">Support the server and unlock exclusive perks</p>

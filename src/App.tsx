@@ -1,15 +1,21 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation, useSearch } from "@tanstack/react-router";
+import { Routes, Route, useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
-import appCss from "../styles.css?url";
 import { StoreProvider, useStore } from "@/lib/store-context";
+import { WishlistProvider } from "@/lib/wishlist-context";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { PageTransition } from "@/components/PageTransition";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
-import { WishlistProvider } from "@/lib/wishlist-context";
 
-function NotFoundComponent() {
+import HomePage from "@/pages/Home";
+import StorePage from "@/pages/Store";
+import CartPage from "@/pages/Cart";
+import ProfilePage from "@/pages/Profile";
+import TicketsPage from "@/pages/Tickets";
+import AdminPage from "@/pages/Admin";
+
+function NotFound() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="max-w-md text-center">
@@ -24,45 +30,15 @@ function NotFoundComponent() {
   );
 }
 
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ArctixMC — Premium Minecraft Survival Server Store" },
-      { name: "description", content: "Join ArctixMC, the ultimate Minecraft survival experience. Buy ranks, coins, and crate keys. IP: play.arctixmc.net" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-});
-
-function RootShell({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head><HeadContent /></head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
 function ReferralCapture() {
-  const search = useSearch({ strict: false }) as { ref?: string };
+  const loc = useLocation();
   useEffect(() => {
-    if (search?.ref) {
-      try { localStorage.setItem("arctix:ref", search.ref); } catch { /* ignore */ }
+    const params = new URLSearchParams(loc.search);
+    const ref = params.get("ref");
+    if (ref) {
+      try { localStorage.setItem("arctix:ref", ref); } catch { /* ignore */ }
     }
-  }, [search?.ref]);
+  }, [loc.search]);
   return null;
 }
 
@@ -87,7 +63,22 @@ function Layout() {
         {!isAdmin && <AnnouncementBanner />}
         {!isAdmin && <Navbar />}
         <main className="flex-1">
-          {isAdmin ? <Outlet /> : <PageTransition><Outlet /></PageTransition>}
+          {isAdmin ? (
+            <Routes>
+              <Route path="/admin" element={<AdminPage />} />
+            </Routes>
+          ) : (
+            <PageTransition>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/store" element={<StorePage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/tickets" element={<TicketsPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </PageTransition>
+          )}
         </main>
         {!isAdmin && <Footer />}
         <Toaster position="top-right" theme="dark" />
@@ -96,7 +87,7 @@ function Layout() {
   );
 }
 
-function RootComponent() {
+export default function App() {
   return (
     <StoreProvider>
       <Layout />
