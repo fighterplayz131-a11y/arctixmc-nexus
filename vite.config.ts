@@ -1,9 +1,29 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, cloudflare (build-only),
-//     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
-//     error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... } }) if needed.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
+import path from "node:path";
 
-export default defineConfig();
+// Plain Vite + React SPA configuration.
+// Compatible with Vercel, Netlify, Pterodactyl, and any static / Node host.
+export default defineConfig({
+  plugins: [react(), tailwindcss(), tsconfigPaths()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  server: {
+    host: "::",
+    port: 8080,
+    strictPort: false,
+  },
+  preview: {
+    host: "0.0.0.0",
+    port: Number(process.env.PORT) || 4173,
+  },
+  build: {
+    outDir: "dist",
+    sourcemap: false,
+  },
+});
