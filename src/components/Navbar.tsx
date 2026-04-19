@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, NavLink } from "react-router-dom";
 import { ShoppingCart, User, LogOut, Menu, X, LifeBuoy } from "lucide-react";
 import { useState } from "react";
 import { useStore } from "@/lib/store-context";
@@ -35,25 +35,24 @@ export function Navbar() {
 
           <nav className="hidden md:flex items-center gap-1">
             {links.map((l) => (
-              <Link
+              <NavLink
                 key={l.to}
                 to={l.to}
-                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
-                activeProps={{ className: "px-3 py-2 text-sm font-medium text-primary rounded-md bg-primary/10" }}
+                end={l.to === "/"}
+                className={({ isActive }) =>
+                  isActive
+                    ? "px-3 py-2 text-sm font-medium text-primary rounded-md bg-primary/10"
+                    : "px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+                }
               >
                 {l.label}
-              </Link>
+              </NavLink>
             ))}
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
             <ThemeToggle />
-            <a
-              href={settings.discordUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#5865F2]/15 text-[#8a93f5] hover:bg-[#5865F2]/25 transition-colors text-sm font-medium"
-            >
+            <a href={settings.discordUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#5865F2]/15 text-[#8a93f5] hover:bg-[#5865F2]/25 transition-colors text-sm font-medium">
               <DiscordIcon className="h-4 w-4" /> Discord
             </a>
             <Link to="/cart" className="relative p-2 rounded-md hover:bg-muted transition-colors" aria-label="Cart">
@@ -70,14 +69,10 @@ export function Navbar() {
                   <User className="h-4 w-4 text-primary" />
                   <span className="text-sm font-medium">{username}</span>
                 </div>
-                <Button variant="ghost" size="icon" onClick={logout} title="Logout">
-                  <LogOut className="h-4 w-4" />
-                </Button>
+                <Button variant="ghost" size="icon" onClick={logout} title="Logout"><LogOut className="h-4 w-4" /></Button>
               </div>
             ) : (
-              <Button onClick={() => setLoginOpen(true)} className="gradient-primary text-primary-foreground">
-                Login
-              </Button>
+              <Button onClick={() => setLoginOpen(true)} className="gradient-primary text-primary-foreground">Login</Button>
             )}
           </div>
 
@@ -89,16 +84,9 @@ export function Navbar() {
         {open && (
           <div className="md:hidden bg-background border-t border-border px-4 py-4 space-y-2">
             {links.map((l) => (
-              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="block px-4 py-2 rounded-md hover:bg-muted">
-                {l.label}
-              </Link>
+              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="block px-4 py-2 rounded-md hover:bg-muted">{l.label}</Link>
             ))}
-            <a
-              href={settings.discordUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#5865F2]/15 text-[#8a93f5]"
-            >
+            <a href={settings.discordUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#5865F2]/15 text-[#8a93f5]">
               <DiscordIcon className="h-4 w-4" /> Join Discord
             </a>
             <Link to="/tickets" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-muted">
@@ -111,9 +99,7 @@ export function Navbar() {
                   <Button size="sm" variant="ghost" onClick={logout}>Logout</Button>
                 </div>
               ) : (
-                <Button onClick={() => { setLoginOpen(true); setOpen(false); }} className="w-full gradient-primary text-primary-foreground">
-                  Login
-                </Button>
+                <Button onClick={() => { setLoginOpen(true); setOpen(false); }} className="w-full gradient-primary text-primary-foreground">Login</Button>
               )}
             </div>
           </div>

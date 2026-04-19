@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useStore } from "@/lib/store-context";
@@ -11,16 +12,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lock, LogOut, Plus, Trash2, Save, Eye, Upload, Send, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { StatusBadge } from "./tickets";
+import { StatusBadge } from "@/pages/Tickets";
 import type { Rank, CoinPack, CrateKey, Settings } from "@/lib/store-defaults";
 import { CouponsAdmin, BundlesAdmin, FlashSalesAdmin, AnnouncementsAdmin, RewardsSettingsAdmin } from "@/components/admin/AdminExtras";
 
-export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — ArctixMC" }, { name: "robots", content: "noindex" }] }),
-  component: AdminPage,
-});
-
-function AdminPage() {
+export default function AdminPage() {
   const [session, setSession] = useState<unknown>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -77,6 +73,7 @@ function AdminLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
+      <Helmet><title>Admin — ArctixMC</title><meta name="robots" content="noindex" /></Helmet>
       <form onSubmit={submit} className="w-full max-w-md rounded-xl bg-card/70 border border-border p-7 space-y-4">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 rounded-full gradient-primary flex items-center justify-center mb-3">
@@ -103,6 +100,7 @@ function AdminLogin() {
 function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   return (
     <div className="min-h-screen">
+      <Helmet><title>Admin — ArctixMC</title></Helmet>
       <header className="bg-card/70 backdrop-blur-md border-b border-border sticky top-0 z-50">
         <div className="mx-auto max-w-7xl px-4 md:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -156,15 +154,9 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 function RanksAdmin() {
   const { ranks, setRanks } = useStore();
   const [uploading, setUploading] = useState<string | null>(null);
-
-  function update(idx: number, patch: Partial<Rank>) {
-    setRanks(ranks.map((r, i) => i === idx ? { ...r, ...patch } : r));
-  }
-  function add() {
-    setRanks([...ranks, { id: `rank-${Date.now()}`, name: "NEW RANK", price: 999, discountPrice: 699, perks: ["New perk"], commands: [], tag: "", color: "#8AEFFF" }]);
-  }
+  function update(idx: number, patch: Partial<Rank>) { setRanks(ranks.map((r, i) => i === idx ? { ...r, ...patch } : r)); }
+  function add() { setRanks([...ranks, { id: `rank-${Date.now()}`, name: "NEW RANK", price: 999, discountPrice: 699, perks: ["New perk"], commands: [], tag: "", color: "#8AEFFF" }]); }
   function remove(idx: number) { setRanks(ranks.filter((_, i) => i !== idx)); toast.success("Rank deleted"); }
-
   async function uploadImage(idx: number, file: File) {
     const id = ranks[idx].id;
     setUploading(id);
@@ -176,7 +168,6 @@ function RanksAdmin() {
     toast.success("Image uploaded");
     setUploading(null);
   }
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -199,31 +190,20 @@ function RanksAdmin() {
             <div><Label className="text-xs">Color</Label><Input type="color" value={r.color} onChange={(e) => update(idx, { color: e.target.value })} className="h-9 p-1" /></div>
             <div><Label className="text-xs">Tag</Label>
               <select value={r.tag} onChange={(e) => update(idx, { tag: e.target.value as Rank["tag"] })} className="w-full h-9 rounded-md bg-input px-3 text-sm border border-border">
-                <option value="">None</option>
-                <option value="Best Value">Best Value</option>
-                <option value="Popular">Popular</option>
+                <option value="">None</option><option value="Best Value">Best Value</option><option value="Popular">Popular</option>
               </select>
             </div>
           </div>
           <div className="flex items-end gap-3">
             {r.image && <img src={r.image} alt="" className="h-16 w-16 rounded-md border border-border object-cover" />}
-            <div className="flex-1">
-              <Label className="text-xs">Image URL</Label>
-              <Input value={r.image ?? ""} onChange={(e) => update(idx, { image: e.target.value })} placeholder="https://..." />
-            </div>
+            <div className="flex-1"><Label className="text-xs">Image URL</Label><Input value={r.image ?? ""} onChange={(e) => update(idx, { image: e.target.value })} placeholder="https://..." /></div>
             <label className="cursor-pointer">
               <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(idx, f); }} />
               <Button asChild variant="outline" size="sm"><span><Upload className="h-3 w-3 mr-1" /> {uploading === r.id ? "…" : "Upload"}</span></Button>
             </label>
           </div>
-          <div>
-            <Label className="text-xs">Perks (one per line)</Label>
-            <Textarea rows={4} value={r.perks.join("\n")} onChange={(e) => update(idx, { perks: e.target.value.split("\n").filter(Boolean) })} />
-          </div>
-          <div>
-            <Label className="text-xs">Commands (one per line)</Label>
-            <Textarea rows={2} value={r.commands.join("\n")} onChange={(e) => update(idx, { commands: e.target.value.split("\n").filter(Boolean) })} />
-          </div>
+          <div><Label className="text-xs">Perks (one per line)</Label><Textarea rows={4} value={r.perks.join("\n")} onChange={(e) => update(idx, { perks: e.target.value.split("\n").filter(Boolean) })} /></div>
+          <div><Label className="text-xs">Commands (one per line)</Label><Textarea rows={2} value={r.commands.join("\n")} onChange={(e) => update(idx, { commands: e.target.value.split("\n").filter(Boolean) })} /></div>
         </Card>
       ))}
     </div>
@@ -235,7 +215,6 @@ function CoinsAdmin() {
   function update(idx: number, patch: Partial<CoinPack>) { setCoins(coins.map((c, i) => i === idx ? { ...c, ...patch } : c)); }
   function add() { setCoins([...coins, { id: `c-${Date.now()}`, coins: 1000, price: 100, visible: true }]); }
   function remove(idx: number) { setCoins(coins.filter((_, i) => i !== idx)); }
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -260,7 +239,6 @@ function KeysAdmin() {
   function update(idx: number, patch: Partial<CrateKey>) { setKeys(keys.map((k, i) => i === idx ? { ...k, ...patch } : k)); }
   function add() { setKeys([...keys, { id: `k-${Date.now()}`, name: "New Crate Key", description: "Description", price: 99, active: true }]); }
   function remove(idx: number) { setKeys(keys.filter((_, i) => i !== idx)); }
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -282,56 +260,29 @@ function KeysAdmin() {
   );
 }
 
-type AdminTicket = {
-  id: string; ticket_no: number; username: string; contact: string | null;
-  category: string; subject: string; description: string; status: string;
-  priority: string; admin_notes: string | null; created_at: string;
-};
+type AdminTicket = { id: string; ticket_no: number; username: string; contact: string | null; category: string; subject: string; description: string; status: string; priority: string; admin_notes: string | null; created_at: string };
 
 function TicketsAdmin() {
   const [tickets, setTickets] = useState<AdminTicket[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expanded, setExpanded] = useState<string | null>(null);
-
-  async function load() {
-    const { data } = await supabase.from("tickets").select("*").order("created_at", { ascending: false }).limit(200);
-    setTickets((data ?? []) as AdminTicket[]);
-  }
+  async function load() { const { data } = await supabase.from("tickets").select("*").order("created_at", { ascending: false }).limit(200); setTickets((data ?? []) as AdminTicket[]); }
   useEffect(() => { load(); }, []);
-
   const filtered = tickets.filter((t) => {
     if (statusFilter !== "all" && t.status !== statusFilter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return t.username.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q) || String(t.ticket_no).includes(q);
-    }
+    if (search) { const q = search.toLowerCase(); return t.username.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q) || String(t.ticket_no).includes(q); }
     return true;
   });
-
-  async function updateTicket(id: string, patch: Partial<AdminTicket>) {
-    const { error } = await supabase.from("tickets").update(patch).eq("id", id);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Updated");
-    load();
-  }
-  async function deleteTicket(id: string) {
-    const { error } = await supabase.from("tickets").delete().eq("id", id);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Deleted");
-    load();
-  }
-
+  async function updateTicket(id: string, patch: Partial<AdminTicket>) { const { error } = await supabase.from("tickets").update(patch).eq("id", id); if (error) { toast.error(error.message); return; } toast.success("Updated"); load(); }
+  async function deleteTicket(id: string) { const { error } = await supabase.from("tickets").delete().eq("id", id); if (error) { toast.error(error.message); return; } toast.success("Deleted"); load(); }
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3 items-center">
         <h2 className="font-display text-lg font-bold mr-auto">Tickets ({filtered.length})</h2>
         <Input className="w-64" placeholder="Search by user, subject, #" value={search} onChange={(e) => setSearch(e.target.value)} />
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 rounded-md bg-input px-3 text-sm border border-border">
-          <option value="all">All status</option>
-          <option value="open">Open</option>
-          <option value="in_progress">In Progress</option>
-          <option value="closed">Closed</option>
+          <option value="all">All status</option><option value="open">Open</option><option value="in_progress">In Progress</option><option value="closed">Closed</option>
         </select>
       </div>
       <div className="space-y-2">
@@ -353,24 +304,14 @@ function TicketsAdmin() {
                   <div>
                     <Label className="text-xs">Status</Label>
                     <select value={t.status} onChange={(e) => updateTicket(t.id, { status: e.target.value })} className="w-full h-9 rounded-md bg-input px-3 text-sm border border-border text-foreground">
-                      <option value="open">Open</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="closed">Closed</option>
+                      <option value="open">Open</option><option value="in_progress">In Progress</option><option value="closed">Closed</option>
                     </select>
                   </div>
-                  <div>
-                    <Label className="text-xs">Priority</Label>
-                    <div className="text-sm py-2 text-foreground">{t.priority}</div>
-                  </div>
+                  <div><Label className="text-xs">Priority</Label><div className="text-sm py-2 text-foreground">{t.priority}</div></div>
                 </div>
-                <div>
-                  <Label className="text-xs">Admin notes (private)</Label>
-                  <Textarea rows={2} defaultValue={t.admin_notes ?? ""} onBlur={(e) => updateTicket(t.id, { admin_notes: e.target.value })} />
-                </div>
+                <div><Label className="text-xs">Admin notes (private)</Label><Textarea rows={2} defaultValue={t.admin_notes ?? ""} onBlur={(e) => updateTicket(t.id, { admin_notes: e.target.value })} /></div>
                 <AdminReplyThread ticketId={t.id} />
-                <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteTicket(t.id)}>
-                  <Trash2 className="h-4 w-4 mr-1" /> Delete ticket
-                </Button>
+                <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteTicket(t.id)}><Trash2 className="h-4 w-4 mr-1" /> Delete ticket</Button>
               </div>
             )}
           </Card>
@@ -382,33 +323,14 @@ function TicketsAdmin() {
 }
 
 type Reply = { id: string; author_type: "user" | "admin"; author_name: string; message: string; created_at: string };
-
 function AdminReplyThread({ ticketId }: { ticketId: string }) {
   const [replies, setReplies] = useState<Reply[]>([]);
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
-
-  async function load() {
-    const { data } = await supabase.from("ticket_replies").select("id,author_type,author_name,message,created_at").eq("ticket_id", ticketId).order("created_at", { ascending: true });
-    setReplies((data ?? []) as Reply[]);
-  }
+  async function load() { const { data } = await supabase.from("ticket_replies").select("id,author_type,author_name,message,created_at").eq("ticket_id", ticketId).order("created_at", { ascending: true }); setReplies((data ?? []) as Reply[]); }
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [ticketId]);
-
-  async function send() {
-    if (!msg.trim()) return;
-    setSending(true);
-    const { error } = await supabase.from("ticket_replies").insert({
-      ticket_id: ticketId, author_type: "admin", author_name: "Staff", message: msg.trim(),
-    });
-    setSending(false);
-    if (error) { toast.error("Could not send"); return; }
-    setMsg(""); load();
-  }
-  async function del(id: string) {
-    await supabase.from("ticket_replies").delete().eq("id", id);
-    load();
-  }
-
+  async function send() { if (!msg.trim()) return; setSending(true); const { error } = await supabase.from("ticket_replies").insert({ ticket_id: ticketId, author_type: "admin", author_name: "Staff", message: msg.trim() }); setSending(false); if (error) { toast.error("Could not send"); return; } setMsg(""); load(); }
+  async function del(id: string) { await supabase.from("ticket_replies").delete().eq("id", id); load(); }
   return (
     <div className="rounded-md border border-border bg-muted/20 p-3 space-y-2">
       <div className="text-xs font-semibold text-foreground">Conversation ({replies.length})</div>
@@ -427,88 +349,41 @@ function AdminReplyThread({ ticketId }: { ticketId: string }) {
       </div>
       <div className="flex gap-2">
         <Textarea rows={2} placeholder="Reply as Staff..." value={msg} onChange={(e) => setMsg(e.target.value)} className="text-sm" />
-        <Button onClick={send} disabled={sending || !msg.trim()} size="sm" className="gradient-primary text-primary-foreground self-end">
-          <Send className="h-3 w-3 mr-1" /> Reply
-        </Button>
+        <Button onClick={send} disabled={sending || !msg.trim()} size="sm" className="gradient-primary text-primary-foreground self-end"><Send className="h-3 w-3 mr-1" /> Reply</Button>
       </div>
     </div>
   );
 }
 
-type Invoice = {
-  id: string; invoice_no: number; username: string; total: number; status: string;
-  items: Array<{ name: string; quantity: number; price: number; type: string }>;
-  ticket_id: string | null; created_at: string;
-};
-
+type Invoice = { id: string; invoice_no: number; username: string; total: number; status: string; items: Array<{ name: string; quantity: number; price: number; type: string }>; ticket_id: string | null; created_at: string };
 function InvoicesAdmin() {
   const [list, setList] = useState<Invoice[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [expanded, setExpanded] = useState<string | null>(null);
-
-  async function load() {
-    const { data } = await supabase.from("invoices").select("*").order("created_at", { ascending: false }).limit(200);
-    setList((data ?? []) as unknown as Invoice[]);
-  }
+  async function load() { const { data } = await supabase.from("invoices").select("*").order("created_at", { ascending: false }).limit(200); setList((data ?? []) as unknown as Invoice[]); }
   useEffect(() => { load(); }, []);
-
-  const filtered = list.filter((inv) => {
-    if (statusFilter !== "all" && inv.status !== statusFilter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return inv.username.toLowerCase().includes(q) || String(inv.invoice_no).includes(q);
-    }
-    return true;
-  });
-
+  const filtered = list.filter((inv) => { if (statusFilter !== "all" && inv.status !== statusFilter) return false; if (search) { const q = search.toLowerCase(); return inv.username.toLowerCase().includes(q) || String(inv.invoice_no).includes(q); } return true; });
   const totalRevenue = list.filter((i) => i.status !== "cancelled").reduce((s, i) => s + Number(i.total), 0);
   const pending = list.filter((i) => i.status === "pending").length;
   const completed = list.filter((i) => i.status === "completed").length;
-
-  async function update(id: string, status: string) {
-    const { error } = await supabase.from("invoices").update({ status }).eq("id", id);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Updated"); load();
-  }
-  async function del(id: string) {
-    if (!confirm("Delete this invoice permanently?")) return;
-    await supabase.from("invoices").delete().eq("id", id);
-    toast.success("Deleted"); load();
-  }
-
+  async function update(id: string, status: string) { const { error } = await supabase.from("invoices").update({ status }).eq("id", id); if (error) { toast.error(error.message); return; } toast.success("Updated"); load(); }
+  async function del(id: string) { if (!confirm("Delete this invoice permanently?")) return; await supabase.from("invoices").delete().eq("id", id); toast.success("Deleted"); load(); }
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="bg-card/70 border-border p-4">
-          <div className="text-xs text-muted-foreground">Total Revenue</div>
-          <div className="font-display text-2xl font-bold text-primary">रु {totalRevenue.toLocaleString()}</div>
-        </Card>
-        <Card className="bg-card/70 border-border p-4">
-          <div className="text-xs text-muted-foreground">Total Orders</div>
-          <div className="font-display text-2xl font-bold text-foreground">{list.length}</div>
-        </Card>
-        <Card className="bg-card/70 border-border p-4">
-          <div className="text-xs text-muted-foreground">Pending</div>
-          <div className="font-display text-2xl font-bold text-amber-400">{pending}</div>
-        </Card>
-        <Card className="bg-card/70 border-border p-4">
-          <div className="text-xs text-muted-foreground">Completed</div>
-          <div className="font-display text-2xl font-bold text-emerald-400">{completed}</div>
-        </Card>
+        <Card className="bg-card/70 border-border p-4"><div className="text-xs text-muted-foreground">Total Revenue</div><div className="font-display text-2xl font-bold text-primary">रु {totalRevenue.toLocaleString()}</div></Card>
+        <Card className="bg-card/70 border-border p-4"><div className="text-xs text-muted-foreground">Total Orders</div><div className="font-display text-2xl font-bold text-foreground">{list.length}</div></Card>
+        <Card className="bg-card/70 border-border p-4"><div className="text-xs text-muted-foreground">Pending</div><div className="font-display text-2xl font-bold text-amber-400">{pending}</div></Card>
+        <Card className="bg-card/70 border-border p-4"><div className="text-xs text-muted-foreground">Completed</div><div className="font-display text-2xl font-bold text-emerald-400">{completed}</div></Card>
       </div>
-
       <div className="flex flex-wrap gap-3 items-center">
         <h2 className="font-display text-lg font-bold text-foreground mr-auto">Invoices ({filtered.length})</h2>
         <Input className="w-64" placeholder="Search by user or #" value={search} onChange={(e) => setSearch(e.target.value)} />
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 rounded-md bg-input px-3 text-sm border border-border text-foreground">
-          <option value="all">All status</option>
-          <option value="pending">Pending</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="all">All status</option><option value="pending">Pending</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
         </select>
       </div>
-
       <div className="space-y-2">
         {filtered.map((inv) => (
           <Card key={inv.id} className="bg-card/70 border-border p-4">
@@ -520,35 +395,21 @@ function InvoicesAdmin() {
                 <div className="text-xs text-muted-foreground">{(inv.items?.length ?? 0)} items · {new Date(inv.created_at).toLocaleString()}</div>
               </div>
               <div className="font-display font-bold text-foreground">रु {Number(inv.total).toLocaleString()}</div>
-              <Badge variant="outline" className={
-                inv.status === "completed" ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-[10px]" :
-                inv.status === "cancelled" ? "bg-red-500/15 text-red-300 border-red-500/30 text-[10px]" :
-                "bg-amber-500/15 text-amber-300 border-amber-500/30 text-[10px]"
-              }>{inv.status}</Badge>
+              <Badge variant="outline" className={inv.status === "completed" ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-[10px]" : inv.status === "cancelled" ? "bg-red-500/15 text-red-300 border-red-500/30 text-[10px]" : "bg-amber-500/15 text-amber-300 border-amber-500/30 text-[10px]"}>{inv.status}</Badge>
             </div>
             {expanded === inv.id && (
               <div className="mt-3 pt-3 border-t border-border space-y-3">
                 <div className="rounded-md bg-muted/30 p-3 space-y-1">
                   {(inv.items ?? []).map((it, idx) => (
-                    <div key={idx} className="flex justify-between text-sm text-foreground">
-                      <span>{it.name} <span className="text-muted-foreground">× {it.quantity}</span></span>
-                      <span className="text-primary">रु {Number(it.price) * Number(it.quantity)}</span>
-                    </div>
+                    <div key={idx} className="flex justify-between text-sm text-foreground"><span>{it.name} <span className="text-muted-foreground">× {it.quantity}</span></span><span className="text-primary">रु {Number(it.price) * Number(it.quantity)}</span></div>
                   ))}
-                  <div className="flex justify-between text-sm font-bold pt-2 border-t border-border mt-2 text-foreground">
-                    <span>Total</span>
-                    <span>रु {Number(inv.total)}</span>
-                  </div>
+                  <div className="flex justify-between text-sm font-bold pt-2 border-t border-border mt-2 text-foreground"><span>Total</span><span>रु {Number(inv.total)}</span></div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <select value={inv.status} onChange={(e) => update(inv.id, e.target.value)} className="h-9 rounded-md bg-input px-3 text-sm border border-border text-foreground">
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="pending">Pending</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
                   </select>
-                  <Button size="sm" variant="ghost" className="text-destructive" onClick={() => del(inv.id)}>
-                    <Trash2 className="h-4 w-4 mr-1" /> Delete
-                  </Button>
+                  <Button size="sm" variant="ghost" className="text-destructive" onClick={() => del(inv.id)}><Trash2 className="h-4 w-4 mr-1" /> Delete</Button>
                 </div>
               </div>
             )}
@@ -564,7 +425,6 @@ function SettingsAdmin() {
   const { settings, setSettings } = useStore();
   const [draft, setDraft] = useState(settings);
   useEffect(() => setDraft(settings), [settings]);
-
   return (
     <Card className="bg-card/70 border-border p-6 space-y-4 max-w-2xl">
       <h2 className="font-display text-lg font-bold">Global Settings</h2>
@@ -573,14 +433,9 @@ function SettingsAdmin() {
         <div><Label>Server IP</Label><Input value={draft.serverIp} onChange={(e) => setDraft({ ...draft, serverIp: e.target.value })} /></div>
         <div><Label>Discord Invite URL</Label><Input value={draft.discordUrl} onChange={(e) => setDraft({ ...draft, discordUrl: e.target.value })} /></div>
         <div><Label>Primary Color</Label><Input type="color" value={draft.primaryColor} onChange={(e) => setDraft({ ...draft, primaryColor: e.target.value })} className="h-10 p-1 w-32" /></div>
-        <div>
-          <Label>Glow Intensity ({draft.glowIntensity}%)</Label>
-          <input type="range" min={0} max={100} value={draft.glowIntensity} onChange={(e) => setDraft({ ...draft, glowIntensity: +e.target.value })} className="w-full" />
-        </div>
+        <div><Label>Glow Intensity ({draft.glowIntensity}%)</Label><input type="range" min={0} max={100} value={draft.glowIntensity} onChange={(e) => setDraft({ ...draft, glowIntensity: +e.target.value })} className="w-full" /></div>
       </div>
-      <Button onClick={() => { setSettings(draft); toast.success("Settings saved"); }} className="gradient-primary text-primary-foreground">
-        <Save className="h-4 w-4 mr-1.5" /> Save Settings
-      </Button>
+      <Button onClick={() => { setSettings(draft); toast.success("Settings saved"); }} className="gradient-primary text-primary-foreground"><Save className="h-4 w-4 mr-1.5" /> Save Settings</Button>
     </Card>
   );
 }
@@ -590,11 +445,8 @@ function HomepageAdmin() {
   const [draft, setDraft] = useState<Settings>(settings);
   const [uploading, setUploading] = useState(false);
   useEffect(() => setDraft(settings), [settings]);
-
   const upd = (patch: Partial<Settings>) => setDraft({ ...draft, ...patch });
-  const updSection = (k: keyof Settings["sections"], v: boolean) =>
-    setDraft({ ...draft, sections: { ...draft.sections, [k]: v } });
-
+  const updSection = (k: keyof Settings["sections"], v: boolean) => setDraft({ ...draft, sections: { ...draft.sections, [k]: v } });
   async function uploadBg(file: File) {
     setUploading(true);
     const path = `homepage-bg-${Date.now()}-${file.name}`;
@@ -605,9 +457,7 @@ function HomepageAdmin() {
     setUploading(false);
     toast.success("Background uploaded");
   }
-
   function save() { setSettings(draft); toast.success("Homepage saved — preview live below"); }
-
   return (
     <div className="grid lg:grid-cols-[1fr_1fr] gap-5">
       <div className="space-y-5">
@@ -629,12 +479,8 @@ function HomepageAdmin() {
               <Button asChild variant="outline" size="sm"><span><Upload className="h-3 w-3 mr-1" /> {uploading ? "Uploading…" : "Upload Background"}</span></Button>
             </label>
           </div>
-          <div>
-            <Label>Overlay Darkness ({draft.heroOverlay}%)</Label>
-            <input type="range" min={0} max={100} value={draft.heroOverlay} onChange={(e) => upd({ heroOverlay: +e.target.value })} className="w-full" />
-          </div>
+          <div><Label>Overlay Darkness ({draft.heroOverlay}%)</Label><input type="range" min={0} max={100} value={draft.heroOverlay} onChange={(e) => upd({ heroOverlay: +e.target.value })} className="w-full" /></div>
         </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-4">
           <h2 className="font-display text-lg font-bold">Game Modes Section</h2>
           <div><Label>Section Title</Label><Input value={draft.modesTitle} onChange={(e) => upd({ modesTitle: e.target.value })} /></div>
@@ -649,147 +495,87 @@ function HomepageAdmin() {
           <div><Label>PvP Text</Label><Textarea rows={2} value={draft.pvpText} onChange={(e) => upd({ pvpText: e.target.value })} /></div>
         </Card>
       </div>
-
       <div className="space-y-5">
         <Card className="bg-card/70 border-border p-5 space-y-4">
           <h2 className="font-display text-lg font-bold">Discord Section</h2>
           <div><Label>Title</Label><Input value={draft.discordTitle} onChange={(e) => upd({ discordTitle: e.target.value })} /></div>
           <div><Label>Description</Label><Textarea rows={3} value={draft.discordText} onChange={(e) => upd({ discordText: e.target.value })} /></div>
         </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-4">
           <h2 className="font-display text-lg font-bold">Featured Ranks Section</h2>
           <div><Label>Title</Label><Input value={draft.featuredTitle} onChange={(e) => upd({ featuredTitle: e.target.value })} /></div>
           <div><Label>Subtitle</Label><Input value={draft.featuredSubtitle} onChange={(e) => upd({ featuredSubtitle: e.target.value })} /></div>
         </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-4">
           <h2 className="font-display text-lg font-bold">Support Banner</h2>
           <div><Label>Title</Label><Input value={draft.ticketBannerTitle} onChange={(e) => upd({ ticketBannerTitle: e.target.value })} /></div>
           <div><Label>Text</Label><Textarea rows={2} value={draft.ticketBannerText} onChange={(e) => upd({ ticketBannerText: e.target.value })} /></div>
         </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-3">
           <h2 className="font-display text-lg font-bold">Stats Section</h2>
           <div className="grid grid-cols-2 gap-3">
-            <div><Label>Active Players</Label><Input value={draft.statActivePlayers} onChange={(e) => upd({ statActivePlayers: e.target.value })} placeholder="2,400+" /></div>
-            <div><Label>Uptime</Label><Input value={draft.statUptime} onChange={(e) => upd({ statUptime: e.target.value })} placeholder="99.9%" /></div>
-            <div><Label>Anti-Cheat</Label><Input value={draft.statAntiCheat} onChange={(e) => upd({ statAntiCheat: e.target.value })} placeholder="Premium" /></div>
-            <div><Label>Custom Plugins</Label><Input value={draft.statPlugins} onChange={(e) => upd({ statPlugins: e.target.value })} placeholder="30+" /></div>
+            <div><Label>Active Players</Label><Input value={draft.statActivePlayers} onChange={(e) => upd({ statActivePlayers: e.target.value })} /></div>
+            <div><Label>Uptime</Label><Input value={draft.statUptime} onChange={(e) => upd({ statUptime: e.target.value })} /></div>
+            <div><Label>Anti-Cheat</Label><Input value={draft.statAntiCheat} onChange={(e) => upd({ statAntiCheat: e.target.value })} /></div>
+            <div><Label>Custom Plugins</Label><Input value={draft.statPlugins} onChange={(e) => upd({ statPlugins: e.target.value })} /></div>
           </div>
         </Card>
-
-        <Card className="bg-card/70 border-border p-5 space-y-4">
-          <h2 className="font-display text-lg font-bold">Support Page</h2>
-          <div><Label>Page Title</Label><Input value={draft.supportTitle} onChange={(e) => upd({ supportTitle: e.target.value })} /></div>
-          <div><Label>Page Subtitle</Label><Textarea rows={2} value={draft.supportSubtitle} onChange={(e) => upd({ supportSubtitle: e.target.value })} /></div>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label>FAQs ({draft.faqs.length})</Label>
-              <Button size="sm" variant="outline" onClick={() => upd({ faqs: [...draft.faqs, { q: "New question", a: "Answer here" }] })}>
-                <Plus className="h-3 w-3 mr-1" /> Add FAQ
-              </Button>
-            </div>
-            {draft.faqs.map((f, i) => (
-              <div key={i} className="rounded-md border border-border bg-muted/20 p-3 space-y-2">
-                <div className="flex gap-2">
-                  <Input className="flex-1" placeholder="Question" value={f.q} onChange={(e) => {
-                    const next = [...draft.faqs]; next[i] = { ...next[i], q: e.target.value }; upd({ faqs: next });
-                  }} />
-                  <Button size="icon" variant="ghost" className="text-destructive shrink-0" onClick={() => upd({ faqs: draft.faqs.filter((_, j) => j !== i) })}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                <Textarea rows={2} placeholder="Answer" value={f.a} onChange={(e) => {
-                  const next = [...draft.faqs]; next[i] = { ...next[i], a: e.target.value }; upd({ faqs: next });
-                }} />
-              </div>
-            ))}
-          </div>
-        </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-3">
           <h2 className="font-display text-lg font-bold">Section Visibility</h2>
           {(Object.keys(draft.sections) as (keyof Settings["sections"])[]).map((k) => (
             <label key={k} className="flex items-center gap-3 text-sm capitalize">
-              <input type="checkbox" checked={draft.sections[k]} onChange={(e) => updSection(k, e.target.checked)} />
-              Show {k} section
+              <input type="checkbox" checked={draft.sections[k]} onChange={(e) => updSection(k, e.target.checked)} /> Show {k} section
             </label>
           ))}
         </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-4">
           <h2 className="font-display text-lg font-bold">Live Players & Server Status</h2>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={!!draft.livePlayersEnabled} onChange={(e) => upd({ livePlayersEnabled: e.target.checked })} /> Show live players strip
-          </label>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!draft.livePlayersEnabled} onChange={(e) => upd({ livePlayersEnabled: e.target.checked })} /> Show live players strip</label>
           <div className="grid grid-cols-2 gap-3">
             <div><Label>Live Player Count</Label><Input type="number" value={draft.livePlayersCount ?? 0} onChange={(e) => upd({ livePlayersCount: +e.target.value })} /></div>
             <div><Label>Players Label</Label><Input value={draft.livePlayersLabel ?? ""} onChange={(e) => upd({ livePlayersLabel: e.target.value })} /></div>
             <div><Label>Server Status</Label>
               <select value={draft.serverStatus ?? "online"} onChange={(e) => upd({ serverStatus: e.target.value as Settings["serverStatus"] })} className="w-full h-9 rounded-md bg-input px-3 text-sm border border-border">
-                <option value="online">Online</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="offline">Offline</option>
+                <option value="online">Online</option><option value="maintenance">Maintenance</option><option value="offline">Offline</option>
               </select>
             </div>
             <div><Label>Status Text</Label><Input value={draft.serverStatusText ?? ""} onChange={(e) => upd({ serverStatusText: e.target.value })} /></div>
           </div>
         </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-4">
           <h2 className="font-display text-lg font-bold">Coins & Store Highlights</h2>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={!!draft.highlightsEnabled} onChange={(e) => upd({ highlightsEnabled: e.target.checked })} /> Show highlights section
-          </label>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!draft.highlightsEnabled} onChange={(e) => upd({ highlightsEnabled: e.target.checked })} /> Show highlights section</label>
           <div><Label>Section Title</Label><Input value={draft.highlightsTitle ?? ""} onChange={(e) => upd({ highlightsTitle: e.target.value })} /></div>
           <div><Label>Subtitle</Label><Input value={draft.highlightsSubtitle ?? ""} onChange={(e) => upd({ highlightsSubtitle: e.target.value })} /></div>
           <div>
             <Label className="text-xs mb-2 block">Featured Coin Packages</Label>
             <div className="grid grid-cols-2 gap-2">
-              {coins.map((c) => {
-                const checked = (draft.highlightCoinIds ?? []).includes(c.id);
-                return (
-                  <label key={c.id} className="flex items-center gap-2 text-xs rounded-md border border-border bg-muted/20 p-2 cursor-pointer">
-                    <input type="checkbox" checked={checked} onChange={(e) => {
-                      const cur = draft.highlightCoinIds ?? [];
-                      upd({ highlightCoinIds: e.target.checked ? [...cur, c.id] : cur.filter((x) => x !== c.id) });
-                    }} />
-                    <span>{c.coins.toLocaleString()} coins · रु {c.price}</span>
-                  </label>
-                );
-              })}
+              {coins.map((c) => { const checked = (draft.highlightCoinIds ?? []).includes(c.id); return (
+                <label key={c.id} className="flex items-center gap-2 text-xs rounded-md border border-border bg-muted/20 p-2 cursor-pointer">
+                  <input type="checkbox" checked={checked} onChange={(e) => { const cur = draft.highlightCoinIds ?? []; upd({ highlightCoinIds: e.target.checked ? [...cur, c.id] : cur.filter((x) => x !== c.id) }); }} />
+                  <span>{c.coins.toLocaleString()} coins · रु {c.price}</span>
+                </label>
+              ); })}
             </div>
           </div>
           <div>
             <Label className="text-xs mb-2 block">Featured Crate Keys</Label>
             <div className="grid grid-cols-2 gap-2">
-              {keys.map((k) => {
-                const checked = (draft.highlightKeyIds ?? []).includes(k.id);
-                return (
-                  <label key={k.id} className="flex items-center gap-2 text-xs rounded-md border border-border bg-muted/20 p-2 cursor-pointer">
-                    <input type="checkbox" checked={checked} onChange={(e) => {
-                      const cur = draft.highlightKeyIds ?? [];
-                      upd({ highlightKeyIds: e.target.checked ? [...cur, k.id] : cur.filter((x) => x !== k.id) });
-                    }} />
-                    <span>{k.name} · रु {k.price}</span>
-                  </label>
-                );
-              })}
+              {keys.map((k) => { const checked = (draft.highlightKeyIds ?? []).includes(k.id); return (
+                <label key={k.id} className="flex items-center gap-2 text-xs rounded-md border border-border bg-muted/20 p-2 cursor-pointer">
+                  <input type="checkbox" checked={checked} onChange={(e) => { const cur = draft.highlightKeyIds ?? []; upd({ highlightKeyIds: e.target.checked ? [...cur, k.id] : cur.filter((x) => x !== k.id) }); }} />
+                  <span>{k.name} · रु {k.price}</span>
+                </label>
+              ); })}
             </div>
           </div>
         </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-bold">Why Choose Section</h2>
-            <Button size="sm" variant="outline" onClick={() => upd({ whyChooseFeatures: [...(draft.whyChooseFeatures ?? []), { icon: "Zap", title: "New feature", text: "Describe it" }] })}>
-              <Plus className="h-3 w-3 mr-1" /> Add
-            </Button>
+            <Button size="sm" variant="outline" onClick={() => upd({ whyChooseFeatures: [...(draft.whyChooseFeatures ?? []), { icon: "Zap", title: "New feature", text: "Describe it" }] })}><Plus className="h-3 w-3 mr-1" /> Add</Button>
           </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={!!draft.whyChooseEnabled} onChange={(e) => upd({ whyChooseEnabled: e.target.checked })} /> Show section
-          </label>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!draft.whyChooseEnabled} onChange={(e) => upd({ whyChooseEnabled: e.target.checked })} /> Show section</label>
           <div><Label>Title</Label><Input value={draft.whyChooseTitle ?? ""} onChange={(e) => upd({ whyChooseTitle: e.target.value })} /></div>
           <div><Label>Subtitle</Label><Textarea rows={2} value={draft.whyChooseSubtitle ?? ""} onChange={(e) => upd({ whyChooseSubtitle: e.target.value })} /></div>
           {(draft.whyChooseFeatures ?? []).map((f, i) => (
@@ -805,17 +591,12 @@ function HomepageAdmin() {
             </div>
           ))}
         </Card>
-
         <Card className="bg-card/70 border-border p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-bold">Server Events</h2>
-            <Button size="sm" variant="outline" onClick={() => upd({ events: [...(draft.events ?? []), { title: "New event", description: "Details", date: "TBD", status: "upcoming" }] })}>
-              <Plus className="h-3 w-3 mr-1" /> Add Event
-            </Button>
+            <Button size="sm" variant="outline" onClick={() => upd({ events: [...(draft.events ?? []), { title: "New event", description: "Details", date: "TBD", status: "upcoming" }] })}><Plus className="h-3 w-3 mr-1" /> Add Event</Button>
           </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={!!draft.eventsEnabled} onChange={(e) => upd({ eventsEnabled: e.target.checked })} /> Show events section
-          </label>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!draft.eventsEnabled} onChange={(e) => upd({ eventsEnabled: e.target.checked })} /> Show events section</label>
           <div><Label>Title</Label><Input value={draft.eventsTitle ?? ""} onChange={(e) => upd({ eventsTitle: e.target.value })} /></div>
           <div><Label>Subtitle</Label><Input value={draft.eventsSubtitle ?? ""} onChange={(e) => upd({ eventsSubtitle: e.target.value })} /></div>
           {(draft.events ?? []).map((ev, i) => (
@@ -823,9 +604,7 @@ function HomepageAdmin() {
               <div className="grid grid-cols-[1fr_auto_auto] gap-2">
                 <Input placeholder="Title" value={ev.title} onChange={(e) => { const n = [...draft.events]; n[i] = { ...n[i], title: e.target.value }; upd({ events: n }); }} />
                 <select value={ev.status} onChange={(e) => { const n = [...draft.events]; n[i] = { ...n[i], status: e.target.value as "live" | "upcoming" | "ended" }; upd({ events: n }); }} className="h-9 rounded-md bg-input px-3 text-sm border border-border">
-                  <option value="live">Live</option>
-                  <option value="upcoming">Upcoming</option>
-                  <option value="ended">Ended</option>
+                  <option value="live">Live</option><option value="upcoming">Upcoming</option><option value="ended">Ended</option>
                 </select>
                 <Button size="icon" variant="ghost" className="text-destructive" onClick={() => upd({ events: draft.events.filter((_, j) => j !== i) })}><Trash2 className="h-4 w-4" /></Button>
               </div>
@@ -834,11 +613,8 @@ function HomepageAdmin() {
             </div>
           ))}
         </Card>
-
         <div className="sticky bottom-4 bg-background/80 backdrop-blur-sm p-3 rounded-lg border border-border">
-          <Button onClick={save} className="gradient-primary text-primary-foreground w-full">
-            <Save className="h-4 w-4 mr-1.5" /> Save Homepage
-          </Button>
+          <Button onClick={save} className="gradient-primary text-primary-foreground w-full"><Save className="h-4 w-4 mr-1.5" /> Save Homepage</Button>
         </div>
       </div>
     </div>
